@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import connectDB from './config/db';
 import logger from './logger';
+import sellerRoutes from './routes/sellerRoutes';
 
 dotenv.config();
 
@@ -15,6 +16,7 @@ connectDB();
 app.use(express.json());
 
 // Routes
+app.use('/api/v1/seller', sellerRoutes);
 
 app.listen(PORT, () => {
   logger.info(`Server is running on http://localhost:${PORT}`);
