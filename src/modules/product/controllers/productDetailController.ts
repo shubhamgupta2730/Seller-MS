@@ -14,7 +14,10 @@ export const getProductDetails = async (req: CustomRequest, res: Response) => {
   console.log(`Seller ID: ${sellerId}`);
 
   try {
-    const product = await Product.findById(productId);
+    const product = await Product.findById(productId).populate({
+      path: 'discounts',
+      select: 'discountType discountValue startDate endDate',
+    });
 
     if (!product) {
       console.log('Product not found');

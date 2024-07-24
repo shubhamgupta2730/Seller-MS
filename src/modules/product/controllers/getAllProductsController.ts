@@ -19,7 +19,10 @@ export const getAllSellerProducts = async (
   }
 
   try {
-    const products = await Product.find({ sellerId });
+    const products = await Product.find({ sellerId }) .populate({
+      path: 'discounts',
+      select: 'discountType discountValue startDate endDate', 
+    });
 
     if (!products.length) {
       console.log('No products found for this seller');
