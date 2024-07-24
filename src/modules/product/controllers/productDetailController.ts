@@ -11,11 +11,9 @@ export const getProductDetails = async (req: CustomRequest, res: Response) => {
   const { productId } = req.query;
   const sellerId = req.user?.userId;
 
-
   console.log(`Seller ID: ${sellerId}`);
 
   try {
-
     const product = await Product.findById(productId);
 
     if (!product) {
@@ -25,7 +23,9 @@ export const getProductDetails = async (req: CustomRequest, res: Response) => {
 
     if (product.sellerId.toString() !== sellerId) {
       console.log('Unauthorized access attempt');
-      return res.status(403).json({ message: 'You are not authorized to view this product' });
+      return res
+        .status(403)
+        .json({ message: 'You are not authorized to view this product' });
     }
 
     console.log('Product found and access authorized');

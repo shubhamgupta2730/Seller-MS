@@ -14,7 +14,7 @@ export const updateProduct = async (req: CustomRequest, res: Response) => {
 
   try {
     const product = await Product.findOneAndUpdate(
-      { _id: productId ,sellerId},
+      { _id: productId, sellerId },
       { name, description, price, stock, bundleId, categoryId },
       { new: true }
     );

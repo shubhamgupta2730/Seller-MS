@@ -20,13 +20,13 @@ router.get(
   authorizeSeller,
   getAllSellerProducts
 );
-router.get('/specific-product', authenticateSeller, authorizeSeller, getProductDetails);
-router.put('/product', authenticateSeller, authorizeSeller, updateProduct);
-router.delete(
-  '/product',
+router.get(
+  '/specific-product',
   authenticateSeller,
   authorizeSeller,
-  deleteProduct
+  getProductDetails
 );
+router.put('/product', authenticateSeller, authorizeSeller, updateProduct);
+router.delete('/product', authenticateSeller, authorizeSeller, deleteProduct);
 
 export default router;
