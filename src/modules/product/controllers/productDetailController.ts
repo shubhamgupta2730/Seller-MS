@@ -9,22 +9,37 @@ interface CustomRequest extends Request {
 
 export const getProductDetails = async (req: CustomRequest, res: Response) => {
   const { productId } = req.query;
-  const sellerId = req.user?.userId;
+  const sellerAuthId = req.user?.userId;
 
-  console.log(`Seller ID: ${sellerId}`);
+
+  if (!productId) {
+    console.log('Product ID is missing from the request');
+    return res.status(400).json({ message: 'Product ID is required' });
+  }
+
+  if (!sellerAuthId) {
+    console.log('Seller ID is missing from the request');
+    return res.status(400).json({ message: 'Seller ID is missing' });
+  }
+
+  console.log(`Seller ID: ${sellerAuthId}`);
+  console.log(`Product ID: ${productId}`);
 
   try {
+
     const product = await Product.findById(productId).populate({
       path: 'discounts',
       select: 'discountType discountValue startDate endDate',
     });
 
+ 
     if (!product) {
       console.log('Product not found');
       return res.status(404).json({ message: 'Product not found' });
     }
 
-    if (product.sellerId.toString() !== sellerId) {
+
+    if (product.sellerAuthId.toString() !== sellerAuthId) {
       console.log('Unauthorized access attempt');
       return res
         .status(403)

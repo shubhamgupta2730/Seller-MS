@@ -1,7 +1,14 @@
 // src/routes/discountRoutes.ts
 import express from 'express';
-import { addDiscount, removeDiscount, updateDiscount } from '../controllers/index';
-import { authenticateSeller, authorizeSeller } from '../../../middleware/authMiddleware';
+import {
+  addDiscount,
+  removeDiscount,
+  updateDiscount,
+} from '../controllers/index';
+import {
+  authenticateSeller,
+  authorizeSeller,
+} from '../../../middleware/authMiddleware';
 
 const router = express.Router();
 

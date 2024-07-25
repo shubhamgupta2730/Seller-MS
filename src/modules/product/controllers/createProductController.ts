@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
-import { Product, Seller } from '../../../models/index';
+import { Product } from '../../../models/index';
+import mongoose from 'mongoose';
 
 interface CustomRequest extends Request {
   user?: {
@@ -9,8 +10,30 @@ interface CustomRequest extends Request {
 
 export const createProduct = async (req: CustomRequest, res: Response) => {
   const { name, description, price, stock, bundleId, categoryId } = req.body;
-
   const sellerId = req.user?.userId;
+
+  if (!sellerId) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+
+
+  if (!name || !price || !stock) {
+    return res.status(400).json({ message: 'Missing required fields' });
+  }
+
+  // Ensure price and stock are positive numbers
+  if (price <= 0 || stock < 0) {
+    return res.status(400).json({ message: 'Invalid price or stock value' });
+  }
+
+  // Ensure bundleId and categoryId are valid MongoDB ObjectIDs if provided
+  if (bundleId && !mongoose.Types.ObjectId.isValid(bundleId)) {
+    return res.status(400).json({ message: 'Invalid bundleId' });
+  }
+
+  if (categoryId && !mongoose.Types.ObjectId.isValid(categoryId)) {
+    return res.status(400).json({ message: 'Invalid categoryId' });
+  }
 
   try {
     const newProduct = new Product({

@@ -1,7 +1,8 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 interface IDiscount extends Document {
-  productId: Schema.Types.ObjectId;
+  productId?: Schema.Types.ObjectId;
+  bundleId?: Schema.Types.ObjectId;
   sellerAuthId: Schema.Types.ObjectId;
   discountType: string;
   discountValue: number;
@@ -12,7 +13,8 @@ interface IDiscount extends Document {
 }
 
 const discountSchema = new Schema<IDiscount>({
-  productId: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
+  productId: { type: Schema.Types.ObjectId, ref: 'Product' },
+  bundleId: { type: Schema.Types.ObjectId, ref: 'BundleProduct' },
   sellerAuthId: { type: Schema.Types.ObjectId, ref: 'Auth', required: true },
   discountType: { type: String, required: true },
   discountValue: { type: Number, required: true },

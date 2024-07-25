@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
-import { Product } from '../../../models/index';
+import mongoose from 'mongoose';
+import { Product, Discount } from '../../../models/index';
 
 interface CustomRequest extends Request {
   user?: {
@@ -11,11 +12,14 @@ export const deleteProduct = async (req: CustomRequest, res: Response) => {
   const { productId } = req.query;
   const sellerId = req.user?.userId;
 
+  // Validate the productId format
+  if (!mongoose.Types.ObjectId.isValid(productId)) {
+    return res.status(400).json({ message: 'Invalid product ID format' });
+  }
+
   try {
-    const product = await Product.findOneAndDelete({
-      _id: productId,
-      sellerId,
-    });
+    // Find the product by ID and ensure it belongs to the seller
+    const product = await Product.findOne({ _id: productId, sellerId });
 
     if (!product) {
       return res
@@ -23,7 +27,15 @@ export const deleteProduct = async (req: CustomRequest, res: Response) => {
         .json({ message: 'Product not found or unauthorized' });
     }
 
-    res.status(200).json({ message: 'Product deleted successfully' });
+ 
+    await Discount.deleteMany({ productId: product._id });
+
+
+    await Product.deleteOne({ _id: productId });
+
+    res.status(200).json({
+      message: 'Product and associated discounts deleted successfully',
+    });
   } catch (error) {
     res.status(500).json({ message: 'Failed to delete product', error });
   }

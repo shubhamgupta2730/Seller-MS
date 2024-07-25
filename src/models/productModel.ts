@@ -4,11 +4,12 @@ interface IProduct extends Document {
   name: string;
   description: string;
   price: number;
+  finalPrice: number;
   stock: number;
-  discounts: Types.ObjectId[];
+  discounts: Types.ObjectId[] | null;
   bundleId: Types.ObjectId | null;
   categoryId: Types.ObjectId | null;
-  sellerId: Types.ObjectId;
+  sellerAuthId: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -17,11 +18,16 @@ const productSchema = new Schema<IProduct>({
   name: { type: String, required: true },
   description: { type: String, required: true },
   price: { type: Number, required: true },
+  finalPrice: { type: Number, default: 0 },
   stock: { type: Number, required: true },
   discounts: [{ type: Schema.Types.ObjectId, ref: 'Discount' }],
-  bundleId: { type: Schema.Types.ObjectId, ref: 'BundleProduct', default: null },
+  bundleId: {
+    type: Schema.Types.ObjectId,
+    ref: 'BundleProduct',
+    default: null,
+  },
   categoryId: { type: Schema.Types.ObjectId, ref: 'Category', default: null },
-  sellerId: { type: Schema.Types.ObjectId, ref: 'Auth', required: true },
+  sellerAuthId: { type: Schema.Types.ObjectId, ref: 'Auth', required: true },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
