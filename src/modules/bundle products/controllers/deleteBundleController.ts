@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
-import { BundleProduct, Discount } from '../../../models/index';
+import mongoose from 'mongoose';
+import { BundleProduct, Product } from '../../../models/index';
 
 interface CustomRequest extends Request {
   user?: {
@@ -9,42 +10,43 @@ interface CustomRequest extends Request {
 
 export const deleteBundle = async (req: CustomRequest, res: Response) => {
   const { bundleId } = req.query;
-  const sellerAuthId = req.user?.userId;
+  const sellerId = req.user?.userId;
 
-  if (!sellerAuthId) {
+  if (!sellerId) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
 
-  if (!bundleId || typeof bundleId !== 'string') {
-    return res.status(400).json({ message: 'Invalid bundle ID' });
+  if (
+    typeof bundleId !== 'string' ||
+    !mongoose.Types.ObjectId.isValid(bundleId)
+  ) {
+    return res.status(400).json({ message: 'Invalid bundle ID format' });
   }
 
   try {
-  
     const bundle = await BundleProduct.findById(bundleId);
 
     if (!bundle) {
       return res.status(404).json({ message: 'Bundle not found' });
     }
 
-
-    if (bundle.sellerAuthId.toString() !== sellerAuthId) {
+    if (bundle.sellerId.toString() !== sellerId) {
       return res
         .status(403)
         .json({ message: 'Unauthorized to delete this bundle' });
     }
 
-    // Find and delete associated discounts
-    const result = await Discount.deleteMany({ bundleId: bundle._id });
-    if (result.deletedCount === 0) {
-      console.warn('No associated discounts found for this bundle');
-    }
-
-    // Delete the bundle
-    await BundleProduct.deleteOne({ _id: bundleId });
+    // Remove the bundle ID from products associated with the bundle
+    await Product.updateMany(
+      { bundleId: bundle._id },
+      { $unset: { bundleId: 1 } }
+    );
+    // Soft delete the bundle
+    bundle.isActive = false;
+    await bundle.save();
 
     res.status(200).json({
-      message: 'Bundle and associated discounts deleted successfully',
+      message: 'Bundle deleted successfully.',
     });
   } catch (error) {
     console.error('Failed to delete bundle', error);

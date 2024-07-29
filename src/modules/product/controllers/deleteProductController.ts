@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
-import { Product, Discount } from '../../../models/index';
+import { Product, BundleProduct } from '../../../models/index';
 
 interface CustomRequest extends Request {
   user?: {
@@ -12,31 +12,59 @@ export const deleteProduct = async (req: CustomRequest, res: Response) => {
   const { productId } = req.query;
   const sellerId = req.user?.userId;
 
-  // Validate the productId format
-  if (!mongoose.Types.ObjectId.isValid(productId)) {
+  console.log('Received request to delete product:', productId);
+  console.log('Seller ID:', sellerId);
+
+  if (
+    typeof productId !== 'string' ||
+    !mongoose.Types.ObjectId.isValid(productId)
+  ) {
+    console.log('Invalid product ID format:', productId);
     return res.status(400).json({ message: 'Invalid product ID format' });
   }
 
+  if (!sellerId) {
+    console.log('Unauthorized request: Missing seller ID');
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+
   try {
-    // Find the product by ID and ensure it belongs to the seller
-    const product = await Product.findOne({ _id: productId, sellerId });
+    // Convert productId to ObjectId
+    const productObjectId = new mongoose.Types.ObjectId(productId);
+
+    const product = await Product.findOne({
+      _id: productObjectId,
+      sellerId: sellerId,
+    });
 
     if (!product) {
+      console.log('Product not found or unauthorized:', productId);
       return res
         .status(404)
         .json({ message: 'Product not found or unauthorized' });
     }
 
- 
-    await Discount.deleteMany({ productId: product._id });
+    console.log('Product found:', product);
 
+    product.isActive = false;
 
-    await Product.deleteOne({ _id: productId });
+    await product.save();
+
+    console.log('Product deactivated:', productId);
+
+    // Remove the product from bundles
+    await BundleProduct.updateMany(
+      { products: productObjectId },
+      { $pull: { products: productObjectId } }
+    );
+
+    console.log('Product removed from bundles:', productId);
 
     res.status(200).json({
-      message: 'Product and associated discounts deleted successfully',
+      message: 'Product deactivated successfully and removed from bundles',
     });
   } catch (error) {
-    res.status(500).json({ message: 'Failed to delete product', error });
+    console.log('Error occurred:', error);
+    res.status(500).json({ message: 'Failed to deactivate product', error });
   }
 };

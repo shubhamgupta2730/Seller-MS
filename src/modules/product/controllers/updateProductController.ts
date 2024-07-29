@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { Product } from '../../../models/index';
+import mongoose from 'mongoose';
 
 interface CustomRequest extends Request {
   user?: {
@@ -9,12 +10,15 @@ interface CustomRequest extends Request {
 
 export const updateProduct = async (req: CustomRequest, res: Response) => {
   const { productId } = req.query;
-  const { name, description, price, stock, bundleId, categoryId } = req.body;
+  const { name, description, MRP, discountPercentage, quantity, categoryId, bundleId } =
+    req.body;
   const sellerId = req.user?.userId;
 
-  if (!productId) {
-    console.log('Product ID is missing from the request');
-    return res.status(400).json({ message: 'Product ID is required' });
+  if (
+    typeof productId !== 'string' ||
+    !mongoose.Types.ObjectId.isValid(productId)
+  ) {
+    return res.status(400).json({ message: 'Invalid product ID format' });
   }
 
   if (!sellerId) {
@@ -23,10 +27,25 @@ export const updateProduct = async (req: CustomRequest, res: Response) => {
   }
 
   try {
+    // Calculate the selling price based on MRP and discountPercentage
+    let sellingPrice = MRP;
+    if (discountPercentage) {
+      sellingPrice = MRP - MRP * (discountPercentage / 100);
+    }
 
+    // Update the product
     const updatedProduct = await Product.findOneAndUpdate(
-      { _id: productId, sellerId },
-      { name, description, price, stock, bundleId, categoryId },
+      { _id: productId, sellerId: sellerId, isActive: true },
+      {
+        name,
+        description,
+        MRP,
+        discountPercentage,
+        sellingPrice,
+        quantity,
+        categoryId,
+        bundleId,
+      },
       { new: true }
     );
 

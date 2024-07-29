@@ -9,41 +9,60 @@ interface CustomRequest extends Request {
 }
 
 export const createProduct = async (req: CustomRequest, res: Response) => {
-  const { name, description, price, stock, bundleId, categoryId } = req.body;
+  const { name, description, MRP, discountPercentage, quantity, categoryId } =
+    req.body;
   const sellerId = req.user?.userId;
 
   if (!sellerId) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
 
-
-  if (!name || !price || !stock) {
-    return res.status(400).json({ message: 'Missing required fields' });
+  if (
+    !name ||
+    !MRP ||
+    discountPercentage === undefined ||
+    quantity === undefined
+  ) {
+    return res.status(400).json({
+      message:
+        'Missing required fields: name, MRP, discountPercentage, and quantity are required',
+    });
   }
 
-  // Ensure price and stock are positive numbers
-  if (price <= 0 || stock < 0) {
-    return res.status(400).json({ message: 'Invalid price or stock value' });
+  // Ensure MRP, discountPercentage, and quantity are positive numbers
+  if (
+    MRP <= 0 ||
+    discountPercentage < 0 ||
+    discountPercentage > 100 ||
+    quantity < 0
+  ) {
+    return res.status(400).json({
+      message:
+        'Invalid MRP, discountPercentage, or quantity value: MRP must be greater than 0, discountPercentage must be between 0 and 100, and quantity cannot be negative',
+    });
   }
 
-  // Ensure bundleId and categoryId are valid MongoDB ObjectIDs if provided
-  if (bundleId && !mongoose.Types.ObjectId.isValid(bundleId)) {
-    return res.status(400).json({ message: 'Invalid bundleId' });
-  }
-
+  //  categoryId is a valid MongoDB ObjectID if provided
   if (categoryId && !mongoose.Types.ObjectId.isValid(categoryId)) {
     return res.status(400).json({ message: 'Invalid categoryId' });
   }
 
   try {
+    //  selling price based on discount percentage
+    let sellingPrice = MRP;
+    if (discountPercentage) {
+      sellingPrice = MRP - MRP * (discountPercentage / 100);
+    }
+
     const newProduct = new Product({
       sellerId,
       name,
       description,
-      price,
-      stock,
-      bundleId,
-      categoryId,
+      MRP,
+      sellingPrice,
+      quantity,
+      discountPercentage,
+      categoryId: categoryId,
     });
 
     await newProduct.save();

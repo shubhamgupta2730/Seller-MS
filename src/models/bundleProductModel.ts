@@ -1,13 +1,14 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import mongoose, { Schema, Document } from 'mongoose';
 
 interface IBundleProduct extends Document {
   name: string;
   description: string;
-  price: number;
-  finalPrice: number;
-  products: Schema.Types.ObjectId[];
-  discounts: Types.ObjectId[] | null;
-  sellerAuthId: Schema.Types.ObjectId;
+  MRP: number;
+  sellingPrice: number;
+  discountPercentage: number;
+  products: { productId: mongoose.Types.ObjectId; quantity: number }[];
+  sellerId: Schema.Types.ObjectId;
+  isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -15,11 +16,21 @@ interface IBundleProduct extends Document {
 const bundleProductSchema = new Schema<IBundleProduct>({
   name: { type: String, required: true },
   description: { type: String, required: true },
-  price: { type: Number, required: true },
-  finalPrice: { type: Number, default: 0 },
-  products: [{ type: Schema.Types.ObjectId, ref: 'Product', required: true }],
-  discounts: [{ type: Schema.Types.ObjectId, ref: 'Discount' }],
-  sellerAuthId: { type: Schema.Types.ObjectId, ref: 'Auth', required: true },
+  MRP: { type: Number, required: true },
+  sellingPrice: { type: Number, required: true },
+  discountPercentage: { type: Number, required: true },
+  products: [
+    {
+      productId: {
+        type: mongoose.Types.ObjectId,
+        ref: 'Product',
+        required: true,
+      },
+      quantity: { type: Number, required: true },
+    },
+  ],
+  sellerId: { type: Schema.Types.ObjectId, ref: 'Auth', required: true },
+  isActive: { type: Boolean, default: true }, // Added isActive field
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });

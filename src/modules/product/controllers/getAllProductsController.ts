@@ -13,43 +13,40 @@ export const getAllSellerProducts = async (
 ) => {
   const sellerId = req.user?.userId;
 
-  // Check if sellerId is provided
   if (!sellerId) {
     console.log('Seller ID is missing from the request');
     return res.status(400).json({ message: 'Seller ID is missing' });
   }
 
-  // Get query parameters for search, sorting, and pagination
-  const { search, sortBy, sortOrder = 'asc', page = 1, limit = 10 } = req.query;
-
-  // Create a filter object
-  const filter: any = { sellerId };
-
-  // Add search filter if search query is provided
-  if (search) {
-    filter.name = { $regex: search, $options: 'i' }; // Case-insensitive search
-  }
-
-  // Determine the sorting criteria
-  const sortCriteria: any = {};
-  if (sortBy) {
-    sortCriteria[sortBy] = sortOrder === 'desc' ? -1 : 1;
-  }
+  const {
+    search = '',
+    sortBy = 'name',
+    sortOrder = 'asc',
+    page = 1,
+    limit = 5,
+  } = req.query;
 
   // Convert page and limit to numbers
   const pageNum = parseInt(page as string, 10);
   const limitNum = parseInt(limit as string, 10);
 
   try {
-    // Fetch products for the seller with filters, sorting, and pagination
-    const products = await Product.find(filter)
-      .populate({
-        path: 'discounts',
-        select: 'discountType discountValue startDate endDate',
-      })
-      .sort(sortCriteria)
+    // Build the query object
+    const query = {
+      sellerId: sellerId,
+      isActive: true,
+      name: { $regex: search, $options: 'i' }
+    };
+
+    // Log the query for debugging
+    console.log('Query:', query);
+
+    // Execute the query
+    const products = await Product.find(query)
+      .sort({ [sortBy as string]: sortOrder === 'desc' ? -1 : 1 })
       .skip((pageNum - 1) * limitNum)
-      .limit(limitNum);
+      .limit(limitNum)
+      .select('name description MRP discountAmount sellingPrice quantity categoryId sellerId');
 
     if (!products.length) {
       console.log('No products found for this seller');
@@ -59,7 +56,7 @@ export const getAllSellerProducts = async (
     }
 
     // Get total count of products for pagination
-    const totalProducts = await Product.countDocuments(filter);
+    const totalProducts = await Product.countDocuments(query);
 
     res.status(200).json({
       products,
