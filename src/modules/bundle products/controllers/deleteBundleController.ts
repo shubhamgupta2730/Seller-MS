@@ -24,13 +24,14 @@ export const deleteBundle = async (req: CustomRequest, res: Response) => {
   }
 
   try {
+    // Find the bundle
     const bundle = await BundleProduct.findById(bundleId);
-
     if (!bundle) {
       return res.status(404).json({ message: 'Bundle not found' });
     }
 
-    if (bundle.sellerId.toString() !== sellerId) {
+    // Check if the current user is authorized to delete the bundle
+    if (bundle.sellerId?.toString() !== sellerId) {
       return res
         .status(403)
         .json({ message: 'Unauthorized to delete this bundle' });
@@ -38,11 +39,12 @@ export const deleteBundle = async (req: CustomRequest, res: Response) => {
 
     // Remove the bundle ID from products associated with the bundle
     await Product.updateMany(
-      { bundleId: bundle._id },
-      { $unset: { bundleId: 1 } }
+      { bundleId: new mongoose.Types.ObjectId(bundleId) },
+      { $unset: { bundleId: '' } }
     );
+
     // Soft delete the bundle
-    bundle.isActive = false;
+    bundle.isDeleted = true;
     await bundle.save();
 
     res.status(200).json({

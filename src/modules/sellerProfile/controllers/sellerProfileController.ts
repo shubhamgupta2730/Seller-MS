@@ -27,25 +27,19 @@ export const createSellerProfile = async (
     return res.status(400).json({ message: 'User ID not found' });
   }
 
-  if ( !shopName || !shopDescription) {
+  if (!shopName || !shopDescription) {
     return res.status(400).json({ message: 'Missing required fields' });
   }
 
-  if (
-    typeof shopName !== 'string' ||
-    typeof shopDescription !== 'string' 
-  ) {
+  if (typeof shopName !== 'string' || typeof shopDescription !== 'string') {
     return res.status(400).json({ message: 'Invalid data types' });
   }
-
 
   if (shopName.length < 3) {
     return res
       .status(400)
       .json({ message: 'Shop name must be at least 3 characters long' });
   }
-
-
 
   try {
     const newSeller = new Seller({
@@ -67,4 +61,3 @@ export const createSellerProfile = async (
     res.status(500).json({ message: 'Failed to create seller profile', error });
   }
 };
-

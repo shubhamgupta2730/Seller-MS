@@ -2,7 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import connectDB from './config/db';
 import { logger } from './logger';
-import morgan from 'morgan'
+import morgan from 'morgan';
 import requestLogger from './middleware/requestLogger';
 import sellerRoutes from './routes/sellerRoutes';
 
@@ -17,7 +17,6 @@ const skip = () => {
   return env === 'test';
 };
 
-
 // Connect to database
 connectDB();
 
@@ -29,7 +28,6 @@ const stream = {
     logger.info(message.trim());
   },
 };
-
 
 // Use morgan middleware for logging HTTP requests
 app.use(morgan('combined', { stream, skip }));

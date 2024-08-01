@@ -15,7 +15,7 @@ interface ProductInfo {
 
 export const updateBundle = async (req: CustomRequest, res: Response) => {
   const { bundleId } = req.query;
-  const { name, description, products, discountPercentage } = req.body;
+  const { name, description, products, discount } = req.body;
   const sellerId = req.user?.userId;
 
   if (!sellerId) {
@@ -37,7 +37,7 @@ export const updateBundle = async (req: CustomRequest, res: Response) => {
       return res.status(404).json({ message: 'Bundle not found' });
     }
 
-    if (bundle.sellerId.toString() !== sellerId) {
+    if (bundle.sellerId?.toString() !== sellerId) {
       return res
         .status(403)
         .json({ message: 'Unauthorized to update this bundle' });
@@ -94,8 +94,8 @@ export const updateBundle = async (req: CustomRequest, res: Response) => {
 
       // Calculate selling price based on discount percentage
       let sellingPrice = totalMRP;
-      if (discountPercentage) {
-        sellingPrice = totalMRP - totalMRP * (discountPercentage / 100);
+      if (discount) {
+        sellingPrice = totalMRP - totalMRP * (discount / 100);
       }
 
       // Update the bundle's product, price, and discount details
@@ -105,8 +105,7 @@ export const updateBundle = async (req: CustomRequest, res: Response) => {
       }));
       bundle.MRP = totalMRP;
       bundle.sellingPrice = sellingPrice;
-      bundle.discountPercentage =
-        discountPercentage || bundle.discountPercentage;
+      bundle.discount = discount || bundle.discount;
 
       // Update product references in the database
       const updatedProductIds = products.map((p) => p.productId.toString());

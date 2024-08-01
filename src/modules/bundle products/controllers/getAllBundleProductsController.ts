@@ -5,6 +5,7 @@ import BundleProduct from '../../../models/bundleProductModel';
 interface CustomRequest extends Request {
   user?: {
     userId: string;
+    role: 'seller' | 'admin';
   };
 }
 
@@ -12,9 +13,10 @@ export const getAllBundleProductSales = async (
   req: CustomRequest,
   res: Response
 ) => {
-  const sellerId = req.user?.userId;
+  const userId = req.user?.userId;
+  const userRole = req.user?.role;
 
-  if (!sellerId) {
+  if (!userId || userRole !== 'seller') {
     return res.status(401).json({ message: 'Unauthorized' });
   }
 
@@ -36,8 +38,11 @@ export const getAllBundleProductSales = async (
 
   // Create a filter object
   const filter: any = {
-    sellerId: new mongoose.Types.ObjectId(sellerId),
+    'createdBy.id': new mongoose.Types.ObjectId(userId),
+    'createdBy.role': 'seller',
     isActive: true,
+    isBlocked: false,
+    isDeleted: false,
   };
 
   // Add search filter if search query is provided
@@ -70,13 +75,9 @@ export const getAllBundleProductSales = async (
           description: 1,
           MRP: 1,
           sellingPrice: 1,
-          discountPercentage: 1,
+          discount: 1,
           'products.productId': 1,
           'products.quantity': 1,
-          'productDetails.MRP': 1,
-          sellerId: 1,
-          createdAt: 1,
-          updatedAt: 1,
         },
       },
       { $sort: sortCriteria },

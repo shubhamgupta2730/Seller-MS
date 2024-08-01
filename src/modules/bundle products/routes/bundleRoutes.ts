@@ -5,7 +5,7 @@ import {
   updateBundle,
   deleteBundle,
   getAllBundleProductSales,
-  getBundleDetails
+  getBundleDetails,
 } from '../controllers/index';
 import {
   authenticateSeller,
@@ -22,7 +22,7 @@ router.get(
   getAllBundleProductSales
 );
 router.get(
-  '/bundle',
+  '/bundle-details',
   authenticateSeller,
   authorizeSeller,
   getBundleDetails

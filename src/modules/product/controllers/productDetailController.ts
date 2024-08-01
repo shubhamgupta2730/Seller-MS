@@ -30,13 +30,45 @@ export const getProductDetails = async (req: CustomRequest, res: Response) => {
   }
 
   try {
-    const product = await Product.findOne({
-      _id: productId,
-      sellerId: sellerId,
-      isActive: true,
-    });
+    const productDetails = await Product.aggregate([
+      {
+        $match: {
+          _id: new mongoose.Types.ObjectId(productId),
+          sellerId: new mongoose.Types.ObjectId(sellerId),
+          isActive: true,
+          isBlocked: false,
+          isDeleted: false,
+        },
+      },
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'categoryId',
+          foreignField: '_id',
+          as: 'category',
+        },
+      },
+      {
+        $unwind: {
+          path: '$category',
+          preserveNullAndEmptyArrays: true, // To include products without a category
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          name: 1,
+          description: 1,
+          MRP: 1,
+          sellingPrice: 1,
+          quantity: 1,
+          discount: 1,
+          category: '$category.name',
+        },
+      },
+    ]);
 
-    if (!product) {
+    if (!productDetails.length) {
       console.log('Product not found or unauthorized');
       return res
         .status(404)
@@ -44,7 +76,7 @@ export const getProductDetails = async (req: CustomRequest, res: Response) => {
     }
 
     console.log('Product found and access authorized');
-    res.status(200).json({ product });
+    res.status(200).json({ product: productDetails[0] });
   } catch (error) {
     console.log('Error occurred:', error);
     res.status(500).json({ message: 'Failed to retrieve product', error });

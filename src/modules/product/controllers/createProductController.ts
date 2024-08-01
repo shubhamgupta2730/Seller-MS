@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { Product } from '../../../models/index';
-import mongoose from 'mongoose';
+import { createProductSchema } from '../../../utils/productValidations';
 
 interface CustomRequest extends Request {
   user?: {
@@ -9,50 +9,21 @@ interface CustomRequest extends Request {
 }
 
 export const createProduct = async (req: CustomRequest, res: Response) => {
-  const { name, description, MRP, discountPercentage, quantity, categoryId } =
-    req.body;
+  const { error, value } = createProductSchema.validate(req.body);
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
+  }
+
+  const { name, description, MRP, discount, quantity, categoryId } = value;
   const sellerId = req.user?.userId;
 
   if (!sellerId) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
 
-  if (
-    !name ||
-    !MRP ||
-    discountPercentage === undefined ||
-    quantity === undefined
-  ) {
-    return res.status(400).json({
-      message:
-        'Missing required fields: name, MRP, discountPercentage, and quantity are required',
-    });
-  }
-
-  // Ensure MRP, discountPercentage, and quantity are positive numbers
-  if (
-    MRP <= 0 ||
-    discountPercentage < 0 ||
-    discountPercentage > 100 ||
-    quantity < 0
-  ) {
-    return res.status(400).json({
-      message:
-        'Invalid MRP, discountPercentage, or quantity value: MRP must be greater than 0, discountPercentage must be between 0 and 100, and quantity cannot be negative',
-    });
-  }
-
-  //  categoryId is a valid MongoDB ObjectID if provided
-  if (categoryId && !mongoose.Types.ObjectId.isValid(categoryId)) {
-    return res.status(400).json({ message: 'Invalid categoryId' });
-  }
-
   try {
-    //  selling price based on discount percentage
-    let sellingPrice = MRP;
-    if (discountPercentage) {
-      sellingPrice = MRP - MRP * (discountPercentage / 100);
-    }
+    // Calculate the selling price based on the discount percentage
+    const sellingPrice = MRP - MRP * (discount / 100);
 
     const newProduct = new Product({
       sellerId,
@@ -61,8 +32,9 @@ export const createProduct = async (req: CustomRequest, res: Response) => {
       MRP,
       sellingPrice,
       quantity,
-      discountPercentage,
-      categoryId: categoryId,
+      discount,
+      categoryId: categoryId || null,
+      createdBy: sellerId,
     });
 
     await newProduct.save();

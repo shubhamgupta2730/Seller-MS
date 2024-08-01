@@ -5,6 +5,7 @@ import { BundleProduct, Product } from '../../../models/index';
 interface CustomRequest extends Request {
   user?: {
     userId: string;
+    role: 'seller' | 'admin';
   };
 }
 
@@ -18,16 +19,17 @@ export const createBundle = async (req: CustomRequest, res: Response) => {
     name,
     description,
     products,
-    discountPercentage,
+    discount,
   }: {
     name: string;
     description: string;
     products: ProductInfo[];
-    discountPercentage: number;
+    discount: number;
   } = req.body;
-  const sellerId = req.user?.userId;
+  const userId = req.user?.userId;
+  const userRole = req.user?.role;
 
-  if (!sellerId) {
+  if (!userId || !userRole) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
 
@@ -44,18 +46,24 @@ export const createBundle = async (req: CustomRequest, res: Response) => {
       (p) => new mongoose.Types.ObjectId(p.productId)
     );
 
-    // Fetch the active products owned by the seller
-    const ownedProducts = await Product.find({
+    // Fetch the active products owned by the seller that are not deleted or blocked
+    const query: any = {
       _id: { $in: productIds },
-      sellerId: new mongoose.Types.ObjectId(sellerId),
       isActive: true,
-    }).exec();
+      isDeleted: false,
+      isBlocked: false,
+    };
+    if (userRole === 'seller') {
+      query.sellerId = new mongoose.Types.ObjectId(userId);
+    }
+
+    const ownedProducts = await Product.find(query).exec();
 
     // Check if the fetched products match the provided product IDs
     if (ownedProducts.length !== productIds.length) {
       return res.status(403).json({
         message:
-          'Unauthorized to bundle one or more products or products are not active',
+          'Unauthorized to bundle one or more products or products are not active, deleted, or blocked',
       });
     }
 
@@ -85,8 +93,8 @@ export const createBundle = async (req: CustomRequest, res: Response) => {
 
     // Calculate selling price based on discount percentage
     let sellingPrice = totalMRP;
-    if (discountPercentage) {
-      sellingPrice = totalMRP - totalMRP * (discountPercentage / 100);
+    if (discount) {
+      sellingPrice = totalMRP - totalMRP * (discount / 100);
     }
 
     // Create new bundle
@@ -95,13 +103,22 @@ export const createBundle = async (req: CustomRequest, res: Response) => {
       description,
       MRP: totalMRP,
       sellingPrice,
-      discountPercentage,
+      discount,
       products: products.map((p) => ({
         productId: new mongoose.Types.ObjectId(p.productId),
         quantity: p.quantity,
       })),
-      sellerId: new mongoose.Types.ObjectId(sellerId),
+      sellerId:
+        userRole === 'seller' ? new mongoose.Types.ObjectId(userId) : undefined,
+      adminId:
+        userRole === 'admin' ? new mongoose.Types.ObjectId(userId) : undefined,
+      createdBy: {
+        id: new mongoose.Types.ObjectId(userId),
+        role: userRole,
+      },
       isActive: true,
+      isDeleted: false,
+      isBlocked: false,
     });
 
     const savedBundle = await newBundle.save();

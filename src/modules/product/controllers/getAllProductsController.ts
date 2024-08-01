@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import Product from '../../../models/productModel';
 
 interface CustomRequest extends Request {
@@ -24,6 +25,7 @@ export const getAllSellerProducts = async (
     sortOrder = 'asc',
     page = 1,
     limit = 5,
+    category = '',
   } = req.query;
 
   // Convert page and limit to numbers
@@ -31,22 +33,56 @@ export const getAllSellerProducts = async (
   const limitNum = parseInt(limit as string, 10);
 
   try {
-    // Build the query object
-    const query = {
-      sellerId: sellerId,
+    // Build the match stage
+    const matchStage: any = {
+      sellerId: new mongoose.Types.ObjectId(sellerId),
       isActive: true,
-      name: { $regex: search, $options: 'i' }
+      isBlocked: false,
+      isDeleted: false,
+      name: { $regex: search, $options: 'i' }, // Search by name
     };
 
-    // Log the query for debugging
-    console.log('Query:', query);
+    // Add category match if provided
+    if (category) {
+      matchStage['category.name'] = { $regex: `^${category}$`, $options: 'i' }; // Exact match for category name
+    }
 
-    // Execute the query
-    const products = await Product.find(query)
-      .sort({ [sortBy as string]: sortOrder === 'desc' ? -1 : 1 })
-      .skip((pageNum - 1) * limitNum)
-      .limit(limitNum)
-      .select('name description MRP discountAmount sellingPrice quantity categoryId sellerId');
+    // Log the match stage for debugging
+    console.log('Match Stage:', matchStage);
+
+    // Execute the aggregation query
+    const products = await Product.aggregate([
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'categoryId',
+          foreignField: '_id',
+          as: 'category',
+        },
+      },
+      {
+        $unwind: {
+          path: '$category',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      { $match: matchStage },
+      {
+        $project: {
+          _id: 1, // Exclude the _id field
+          name: 1,
+          description: 1,
+          MRP: 1,
+          sellingPrice: 1,
+          quantity: 1,
+          discount: 1,
+          category: '$category.name', // Include the category name
+        },
+      },
+      { $sort: { [sortBy as string]: sortOrder === 'desc' ? -1 : 1 } },
+      { $skip: (pageNum - 1) * limitNum },
+      { $limit: limitNum },
+    ]);
 
     if (!products.length) {
       console.log('No products found for this seller');
@@ -56,12 +92,33 @@ export const getAllSellerProducts = async (
     }
 
     // Get total count of products for pagination
-    const totalProducts = await Product.countDocuments(query);
+    const totalProducts = await Product.aggregate([
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'categoryId',
+          foreignField: '_id',
+          as: 'category',
+        },
+      },
+      {
+        $unwind: {
+          path: '$category',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      { $match: matchStage },
+      {
+        $count: 'total',
+      },
+    ]);
+
+    const total = totalProducts[0]?.total || 0;
 
     res.status(200).json({
       products,
       pagination: {
-        total: totalProducts,
+        total: total,
         page: pageNum,
         limit: limitNum,
       },
