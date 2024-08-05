@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
-import { BundleProduct, Product } from '../../../models/index';
+import { Bundle, Product } from '../../../models/index';
 
 interface CustomRequest extends Request {
   user?: {
@@ -98,7 +98,7 @@ export const createBundle = async (req: CustomRequest, res: Response) => {
     }
 
     // Create new bundle
-    const newBundle = new BundleProduct({
+    const newBundle = new Bundle({
       name,
       description,
       MRP: totalMRP,

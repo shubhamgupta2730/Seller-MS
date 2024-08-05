@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
-import { Product, BundleProduct } from '../../../models/index';
+import { Product, Bundle } from '../../../models/index';
 
 interface CustomRequest extends Request {
   user?: {
@@ -38,7 +38,7 @@ export const deleteProduct = async (req: CustomRequest, res: Response) => {
     const product = await Product.findOne({
       _id: productObjectId,
       sellerId: sellerId,
-      isDeleted: false, // Ensure we're not trying to delete an already deleted product
+      isDeleted: false,
     });
 
     if (!product) {
@@ -52,22 +52,47 @@ export const deleteProduct = async (req: CustomRequest, res: Response) => {
 
     // Mark product as deleted
     product.isDeleted = true;
-
     await product.save();
-
     console.log('Product marked as deleted:', productId);
 
     // Remove the product from bundles
-    await BundleProduct.updateMany(
-      { products: productObjectId },
-      { $pull: { products: productObjectId } }
+    const result = await Bundle.updateMany(
+      { 'products.productId': productObjectId },
+      { $pull: { products: { productId: productObjectId } } }
     );
 
+    console.log('Update result:', result);
     console.log('Product removed from bundles:', productId);
 
+    // Recalculate the total price and selling price for affected bundles
+    const bundles = await Bundle.find({ 'products.productId': productObjectId });
+    for (const bundle of bundles) {
+      let totalMRP = 0;
+
+      // Recalculate total MRP
+      for (const product of bundle.products) {
+        const prod = await Product.findById(product.productId);
+        if (prod && prod.MRP) {
+          totalMRP += prod.MRP * product.quantity;
+        }
+      }
+
+      // Apply the discount to calculate the new selling price
+      let sellingPrice = totalMRP;
+      if (bundle.discount) {
+        sellingPrice = totalMRP - totalMRP * (bundle.discount / 100);
+      }
+
+      // Update bundle with new prices
+      bundle.MRP = totalMRP;
+      bundle.sellingPrice = sellingPrice;
+
+      await bundle.save();
+      console.log(`Bundle ${bundle._id} updated with new prices.`);
+    }
+
     res.status(200).json({
-      message:
-        'Product marked as deleted successfully and removed from bundles',
+      message: 'Product marked as deleted successfully and removed from bundles',
     });
   } catch (error) {
     console.log('Error occurred:', error);

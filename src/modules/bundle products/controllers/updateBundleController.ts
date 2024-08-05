@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { BundleProduct, Product } from '../../../models/index';
 import mongoose from 'mongoose';
+import { Bundle, Product } from '../../../models/index';
 
 interface CustomRequest extends Request {
   user?: {
@@ -27,12 +27,12 @@ export const updateBundle = async (req: CustomRequest, res: Response) => {
     typeof bundleId !== 'string' ||
     !mongoose.Types.ObjectId.isValid(bundleId)
   ) {
-    return res.status(400).json({ message: 'Invalid bundle ID' });
+    return res.status(400).json({ message: 'Invalid bundle ID format' });
   }
 
   try {
     // Find the existing bundle
-    const bundle = await BundleProduct.findById(bundleId);
+    const bundle = await Bundle.findById(bundleId);
     if (!bundle) {
       return res.status(404).json({ message: 'Bundle not found' });
     }
@@ -43,17 +43,29 @@ export const updateBundle = async (req: CustomRequest, res: Response) => {
         .json({ message: 'Unauthorized to update this bundle' });
     }
 
-    // Track old product IDs
-    const oldProductIds = bundle.products.map((p) => p.productId.toString());
+    // Track old product IDs and quantities
+    const oldProductsMap = new Map(
+      bundle.products.map((p) => [p.productId.toString(), p.quantity])
+    );
 
-    // Validate and update products in the bundle
+    // Validate and add/update products in the bundle
     if (products && Array.isArray(products)) {
-      // Extract product IDs from the new products array
-      const productIds = products.map(
-        (product: ProductInfo) => product.productId
-      );
+      const newProductIds = new Set<string>();
+      const productUpdates = new Map<string, number>();
+
+      // Extract product IDs and quantities from the new products array
+      products.forEach((product: ProductInfo) => {
+        const productId = product.productId;
+        const quantity = product.quantity;
+        newProductIds.add(productId);
+        productUpdates.set(
+          productId,
+          (productUpdates.get(productId) || 0) + quantity
+        );
+      });
 
       // Ensure the seller owns all the products and they are active
+      const productIds = Array.from(newProductIds);
       const ownedProducts = await Product.find({
         _id: { $in: productIds },
         sellerId: new mongoose.Types.ObjectId(sellerId),
@@ -78,17 +90,13 @@ export const updateBundle = async (req: CustomRequest, res: Response) => {
       });
 
       // Calculate total MRP and validate quantities
-      for (const productInfo of products) {
-        const productId = productInfo.productId;
-        const quantity = productInfo.quantity;
-
+      for (const [productId, quantity] of productUpdates.entries()) {
         if (!productPriceMap[productId]) {
           return res
             .status(404)
             .json({ message: `Product with ID ${productId} not found` });
         }
 
-        // Add to total MRP
         totalMRP += productPriceMap[productId] * quantity;
       }
 
@@ -99,24 +107,27 @@ export const updateBundle = async (req: CustomRequest, res: Response) => {
       }
 
       // Update the bundle's product, price, and discount details
-      bundle.products = products.map((p) => ({
-        productId: new mongoose.Types.ObjectId(p.productId),
-        quantity: p.quantity,
-      }));
+      bundle.products = Array.from(productUpdates.entries()).map(
+        ([productId, quantity]) => ({
+          productId: new mongoose.Types.ObjectId(productId),
+          quantity,
+        })
+      );
       bundle.MRP = totalMRP;
       bundle.sellingPrice = sellingPrice;
       bundle.discount = discount || bundle.discount;
 
       // Update product references in the database
-      const updatedProductIds = products.map((p) => p.productId.toString());
+      const newProductIdsArray = Array.from(newProductIds);
 
-      // Remove the old bundle ID from products
+      // Remove the old bundle ID from products that are no longer in the bundle
       await Product.updateMany(
         {
           _id: {
-            $in: oldProductIds.map((id) => new mongoose.Types.ObjectId(id)),
+            $in: Array.from(oldProductsMap.keys()).filter(
+              (oldProductId) => !newProductIdsArray.includes(oldProductId)
+            ),
           },
-          bundleId: new mongoose.Types.ObjectId(bundleId),
         },
         { $unset: { bundleId: '' } }
       );
@@ -125,7 +136,9 @@ export const updateBundle = async (req: CustomRequest, res: Response) => {
       await Product.updateMany(
         {
           _id: {
-            $in: updatedProductIds.map((id) => new mongoose.Types.ObjectId(id)),
+            $in: newProductIdsArray.map(
+              (id) => new mongoose.Types.ObjectId(id)
+            ),
           },
         },
         { $set: { bundleId: new mongoose.Types.ObjectId(bundleId) } }

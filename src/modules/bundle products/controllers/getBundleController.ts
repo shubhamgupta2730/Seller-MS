@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
-import { BundleProduct, Product } from '../../../models/index';
+import { Bundle } from '../../../models/index';
 
 // Define an interface for the Product schema
 interface ProductDetails {
@@ -49,7 +49,7 @@ export const getBundleDetails = async (req: CustomRequest, res: Response) => {
   }
 
   try {
-    const bundle = (await BundleProduct.findOne({
+    const bundle = (await Bundle.findOne({
       _id: bundleId,
       sellerId: new mongoose.Types.ObjectId(sellerId),
       isActive: true,

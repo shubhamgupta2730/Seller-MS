@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import { Product } from '../../../models/index';
 import { createProductSchema } from '../../../utils/productValidations';
+import Category from '../../../models/categoryModel';
 
 interface CustomRequest extends Request {
   user?: {
@@ -21,7 +23,23 @@ export const createProduct = async (req: CustomRequest, res: Response) => {
     return res.status(401).json({ message: 'Unauthorized' });
   }
 
+  if (categoryId && !mongoose.Types.ObjectId.isValid(categoryId)) {
+    return res.status(400).json({ message: 'Invalid category ID' });
+  }
+
   try {
+    if (categoryId) {
+      const category = await Category.findOne({
+        _id: categoryId,
+        isActive: true,
+      });
+      if (!category) {
+        return res
+          .status(400)
+          .json({ message: 'Category does not exist or is not active' });
+      }
+    }
+
     // Calculate the selling price based on the discount percentage
     const sellingPrice = MRP - MRP * (discount / 100);
 

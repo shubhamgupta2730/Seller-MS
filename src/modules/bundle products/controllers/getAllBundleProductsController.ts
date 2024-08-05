@@ -27,6 +27,7 @@ export const getAllBundleProductSales = async (
     sortOrder = 'asc',
     page = '1',
     limit = '5',
+    showBlocked = 'false', // Default to 'false'
   } = req.query;
 
   // Type cast and handle defaults
@@ -35,14 +36,15 @@ export const getAllBundleProductSales = async (
   const sortOrderValue = typeof sortOrder === 'string' ? sortOrder : 'asc';
   const pageNum = parseInt(page as string, 10);
   const limitNum = parseInt(limit as string, 10);
+  const showBlockedProducts = showBlocked === 'true';
 
   // Create a filter object
   const filter: any = {
     'createdBy.id': new mongoose.Types.ObjectId(userId),
     'createdBy.role': 'seller',
     isActive: true,
-    isBlocked: false,
     isDeleted: false,
+    isBlocked: showBlockedProducts, // Show blocked products if showBlocked is true
   };
 
   // Add search filter if search query is provided
@@ -78,6 +80,7 @@ export const getAllBundleProductSales = async (
           discount: 1,
           'products.productId': 1,
           'products.quantity': 1,
+          isBlocked: 1, // Include isBlocked in the projection
         },
       },
       { $sort: sortCriteria },

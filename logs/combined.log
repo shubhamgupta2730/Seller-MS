@@ -382,3 +382,259 @@
 2024-08-01 18:53:43 info: MongoDB connected
 2024-08-01 18:53:45 info: Server is running on http://localhost:3003
 2024-08-01 18:53:46 info: MongoDB connected
+2024-08-01 22:08:27 info: Server is running on http://localhost:3003
+2024-08-01 22:08:28 info: MongoDB connected
+2024-08-01 22:17:53 info: Server is running on http://localhost:3003
+2024-08-01 22:17:58 info: MongoDB connected
+2024-08-01 22:27:51 info: Server is running on http://localhost:3003
+2024-08-01 22:27:53 info: MongoDB connected
+2024-08-01 22:32:17 info: Server is running on http://localhost:3003
+2024-08-01 22:32:19 info: MongoDB connected
+2024-08-01 22:32:28 info: Server is running on http://localhost:3003
+2024-08-01 22:32:30 info: MongoDB connected
+2024-08-01 22:39:06 info: Server is running on http://localhost:3003
+2024-08-01 22:39:07 info: MongoDB connected
+2024-08-01 22:42:22 info: Server is running on http://localhost:3003
+2024-08-01 22:42:25 info: MongoDB connected
+2024-08-01 22:48:05 info: Server is running on http://localhost:3003
+2024-08-01 22:48:06 info: MongoDB connected
+2024-08-01 22:48:09 info: Server is running on http://localhost:3003
+2024-08-01 22:48:11 info: MongoDB connected
+2024-08-01 22:49:05 info: Server is running on http://localhost:3003
+2024-08-01 22:49:07 info: MongoDB connected
+2024-08-01 22:49:15 info: Server is running on http://localhost:3003
+2024-08-01 22:49:16 info: MongoDB connected
+2024-08-01 22:49:18 info: Server is running on http://localhost:3003
+2024-08-01 22:49:19 info: MongoDB connected
+2024-08-01 23:05:56 info: Server is running on http://localhost:3003
+2024-08-01 23:05:57 info: MongoDB connected
+2024-08-01 23:13:21 info: Incoming request: POST /api/v1/seller/sellerProfileRoute/sellerProfile - Body: {"shopName":"Elecronics Shop","shopDescription":"All types of electronics  are available","shopContactNumber":"+1234567890","businessLicense":"BL1234567890","taxId":"TX1234567890","website":"http://www.example-shop.com"}
+2024-08-01 23:13:21 info: ::1 - - [01/Aug/2024:17:43:21 +0000] "POST /api/v1/seller/sellerProfileRoute/sellerProfile HTTP/1.1" 201 49 "-" "PostmanRuntime/7.40.0"
+2024-08-01 23:13:21 info: Response status: 201 - Response time: 153.75ms
+2024-08-01 23:13:28 info: Incoming request: GET /api/v1/seller/sellerProfileRoute/getSellerProfile - Body: {}
+2024-08-01 23:13:28 info: ::1 - - [01/Aug/2024:17:43:28 +0000] "GET /api/v1/seller/sellerProfileRoute/getSellerProfile HTTP/1.1" 200 259 "-" "PostmanRuntime/7.40.0"
+2024-08-01 23:13:28 info: Response status: 200 - Response time: 94.47ms
+2024-08-01 23:13:51 info: Incoming request: PUT /api/v1/seller/sellerProfileRoute/update-profile - Body: {"shopName":"Elecronics Shop","shopDescription":"All types of electronics  are available","shopContactNumber":"+1234567890","businessLicense":"BL1234567890","taxId":"TX1234567890","website":"http://www.example-shop.com"}
+2024-08-01 23:13:51 info: ::1 - - [01/Aug/2024:17:43:51 +0000] "PUT /api/v1/seller/sellerProfileRoute/update-profile HTTP/1.1" 401 31 "-" "PostmanRuntime/7.40.0"
+2024-08-01 23:13:51 info: Response status: 401 - Response time: 1.26ms
+2024-08-01 23:14:04 info: Incoming request: PUT /api/v1/seller/sellerProfileRoute/update-profile - Body: {"shopName":"Elecronics Shop","shopDescription":"All types of electronics  are available","shopContactNumber":"+1234567890","businessLicense":"BL1234567890","taxId":"TX1234567890","website":"http://www.example-shop.com"}
+2024-08-01 23:14:04 info: ::1 - - [01/Aug/2024:17:44:04 +0000] "PUT /api/v1/seller/sellerProfileRoute/update-profile HTTP/1.1" 200 434 "-" "PostmanRuntime/7.40.0"
+2024-08-01 23:14:04 info: Response status: 200 - Response time: 90.05ms
+2024-08-01 23:14:22 info: Incoming request: GET /api/v1/seller/sellerProfileRoute/getSellerProfile - Body: {}
+2024-08-01 23:14:22 info: ::1 - - [01/Aug/2024:17:44:22 +0000] "GET /api/v1/seller/sellerProfileRoute/getSellerProfile HTTP/1.1" 200 259 "-" "PostmanRuntime/7.40.0"
+2024-08-01 23:14:22 info: Response status: 200 - Response time: 93.55ms
+2024-08-01 23:39:52 info: Incoming request: POST /api/v1/seller/productRoute/product - Body: {"name":"Smartphone 1","description":"smartphone 1 desc","MRP":10000,"discount":10,"quantity":10,"categoryId":"66abcf49a66c83786066a3d5"}
+2024-08-01 23:39:52 info: ::1 - - [01/Aug/2024:18:09:52 +0000] "POST /api/v1/seller/productRoute/product HTTP/1.1" 201 491 "-" "PostmanRuntime/7.40.0"
+2024-08-01 23:39:52 info: Response status: 201 - Response time: 246.54ms
+2024-08-01 23:40:06 info: Incoming request: POST /api/v1/seller/productRoute/product - Body: {"name":"Smartphone 2","description":"smartphone 2 desc","MRP":10000,"discount":10,"quantity":10,"categoryId":"66abcf49a66c83786066a3d5"}
+2024-08-01 23:40:06 info: ::1 - - [01/Aug/2024:18:10:06 +0000] "POST /api/v1/seller/productRoute/product HTTP/1.1" 201 491 "-" "PostmanRuntime/7.40.0"
+2024-08-01 23:40:06 info: Response status: 201 - Response time: 165.41ms
+2024-08-01 23:40:16 info: Incoming request: POST /api/v1/seller/productRoute/product - Body: {"name":"Smartphone 3","description":"smartphone 2 desc","MRP":10000,"discount":10,"quantity":10,"categoryId":"66abcf49a66c83786066a3d5"}
+2024-08-01 23:40:16 info: ::1 - - [01/Aug/2024:18:10:16 +0000] "POST /api/v1/seller/productRoute/product HTTP/1.1" 201 491 "-" "PostmanRuntime/7.40.0"
+2024-08-01 23:40:16 info: Response status: 201 - Response time: 179.02ms
+2024-08-01 23:40:19 info: Incoming request: POST /api/v1/seller/productRoute/product - Body: {"name":"Smartphone 4","description":"smartphone 2 desc","MRP":10000,"discount":10,"quantity":10,"categoryId":"66abcf49a66c83786066a3d5"}
+2024-08-01 23:40:20 info: ::1 - - [01/Aug/2024:18:10:20 +0000] "POST /api/v1/seller/productRoute/product HTTP/1.1" 201 491 "-" "PostmanRuntime/7.40.0"
+2024-08-01 23:40:20 info: Response status: 201 - Response time: 244.91ms
+2024-08-01 23:40:23 info: Incoming request: POST /api/v1/seller/productRoute/product - Body: {"name":"Smartphone 5","description":"smartphone 2 desc","MRP":10000,"discount":10,"quantity":10,"categoryId":"66abcf49a66c83786066a3d5"}
+2024-08-01 23:40:24 info: ::1 - - [01/Aug/2024:18:10:24 +0000] "POST /api/v1/seller/productRoute/product HTTP/1.1" 201 491 "-" "PostmanRuntime/7.40.0"
+2024-08-01 23:40:24 info: Response status: 201 - Response time: 186.27ms
+2024-08-01 23:40:28 info: Incoming request: POST /api/v1/seller/productRoute/product - Body: {"name":"Smartphone 6","description":"smartphone 2 desc","MRP":10000,"discount":10,"quantity":10,"categoryId":"66abcf49a66c83786066a3d5"}
+2024-08-01 23:40:28 info: ::1 - - [01/Aug/2024:18:10:28 +0000] "POST /api/v1/seller/productRoute/product HTTP/1.1" 201 491 "-" "PostmanRuntime/7.40.0"
+2024-08-01 23:40:28 info: Response status: 201 - Response time: 152.15ms
+2024-08-01 23:40:34 info: Incoming request: GET /api/v1/seller/productRoute/product?search=laptop&sortBy=name&sortOrder=desc&page=1&limit=6 - Body: {}
+2024-08-01 23:40:35 info: ::1 - - [01/Aug/2024:18:10:35 +0000] "GET /api/v1/seller/productRoute/product?search=laptop&sortBy=name&sortOrder=desc&page=1&limit=6 HTTP/1.1" 404 47 "-" "PostmanRuntime/7.40.0"
+2024-08-01 23:40:35 info: Response status: 404 - Response time: 86.24ms
+2024-08-01 23:40:49 info: Incoming request: GET /api/v1/seller/productRoute/product?sortBy=name&sortOrder=desc&page=1&limit=6 - Body: {}
+2024-08-01 23:40:49 info: ::1 - - [01/Aug/2024:18:10:49 +0000] "GET /api/v1/seller/productRoute/product?sortBy=name&sortOrder=desc&page=1&limit=6 HTTP/1.1" 200 1114 "-" "PostmanRuntime/7.40.0"
+2024-08-01 23:40:49 info: Response status: 200 - Response time: 169.29ms
+2024-08-01 23:41:13 info: Incoming request: GET /api/v1/seller/productRoute/product?sortBy=name&sortOrder=asc&page=1&limit=6 - Body: {}
+2024-08-01 23:41:13 info: ::1 - - [01/Aug/2024:18:11:13 +0000] "GET /api/v1/seller/productRoute/product?sortBy=name&sortOrder=asc&page=1&limit=6 HTTP/1.1" 200 1114 "-" "PostmanRuntime/7.40.0"
+2024-08-01 23:41:13 info: Response status: 200 - Response time: 173.83ms
+2024-08-01 23:41:32 info: Incoming request: GET /api/v1/seller/productRoute/specific-product?productId=66abcf8cbd41ad01c437d3cc - Body: {}
+2024-08-01 23:41:32 info: ::1 - - [01/Aug/2024:18:11:32 +0000] "GET /api/v1/seller/productRoute/specific-product?productId=66abcf8cbd41ad01c437d3cc HTTP/1.1" 200 154 "-" "PostmanRuntime/7.40.0"
+2024-08-01 23:41:32 info: Response status: 200 - Response time: 94.63ms
+2024-08-01 23:42:40 info: Incoming request: POST /api/v1/seller/bundleRoute/bundle - Body: {"name":"smartphone bundle","description":"A Bundle 1 description","products":[{"productId":"66abcf88bd41ad01c437d3c9","quantity":1},{"productId":"66abcf88bd41ad01c437d3c9","quantity":1},{"productId":"66abcf88bd41ad01c437d3c9","quantity":1}],"discount":"10"}
+2024-08-01 23:42:40 info: ::1 - - [01/Aug/2024:18:12:40 +0000] "POST /api/v1/seller/bundleRoute/bundle HTTP/1.1" 403 105 "-" "PostmanRuntime/7.40.0"
+2024-08-01 23:42:40 info: Response status: 403 - Response time: 103.36ms
+2024-08-01 23:43:06 info: Incoming request: POST /api/v1/seller/bundleRoute/bundle - Body: {"name":"smartphone bundle","description":"A Bundle 1 description","products":[{"productId":"66abcf88bd41ad01c437d3c9","quantity":1},{"productId":"66abcf70bd41ad01c437d3c3","quantity":1},{"productId":"66abcf8cbd41ad01c437d3cc","quantity":1}],"discount":"10"}
+2024-08-01 23:43:06 info: ::1 - - [01/Aug/2024:18:13:06 +0000] "POST /api/v1/seller/bundleRoute/bundle HTTP/1.1" 201 710 "-" "PostmanRuntime/7.40.0"
+2024-08-01 23:43:06 info: Response status: 201 - Response time: 323.47ms
+2024-08-01 23:43:53 info: Incoming request: GET /api/v1/seller/bundleRoute/bundle-details?bundleId=66abd032bd41ad01c437d3dc - Body: {}
+2024-08-01 23:43:53 info: ::1 - - [01/Aug/2024:18:13:53 +0000] "GET /api/v1/seller/bundleRoute/bundle-details?bundleId=66abd032bd41ad01c437d3dc HTTP/1.1" 200 537 "-" "PostmanRuntime/7.40.0"
+2024-08-01 23:43:53 info: Response status: 200 - Response time: 216.43ms
+2024-08-01 23:44:11 info: Incoming request: GET /api/v1/seller/bundleRoute/bundle - Body: {}
+2024-08-01 23:44:11 info: ::1 - - [01/Aug/2024:18:14:11 +0000] "GET /api/v1/seller/bundleRoute/bundle HTTP/1.1" 200 1026 "-" "PostmanRuntime/7.40.0"
+2024-08-01 23:44:11 info: Response status: 200 - Response time: 201.86ms
+2024-08-01 23:45:18 info: Incoming request: GET /api/v1/seller/bundleRoute/bundle?search=&sortBy=name&sortOrder=asc&page=1&limit=6 - Body: {}
+2024-08-01 23:45:18 info: ::1 - - [01/Aug/2024:18:15:18 +0000] "GET /api/v1/seller/bundleRoute/bundle?search=&sortBy=name&sortOrder=asc&page=1&limit=6 HTTP/1.1" 200 1026 "-" "PostmanRuntime/7.40.0"
+2024-08-01 23:45:18 info: Response status: 200 - Response time: 161.57ms
+2024-08-01 23:45:39 info: Incoming request: GET /api/v1/seller/bundleRoute/bundle?search=mart&sortBy=name&sortOrder=asc&page=1&limit=6 - Body: {}
+2024-08-01 23:45:39 info: ::1 - - [01/Aug/2024:18:15:39 +0000] "GET /api/v1/seller/bundleRoute/bundle?search=mart&sortBy=name&sortOrder=asc&page=1&limit=6 HTTP/1.1" 200 1026 "-" "PostmanRuntime/7.40.0"
+2024-08-01 23:45:39 info: Response status: 200 - Response time: 185.36ms
+2024-08-01 23:46:13 info: Incoming request: DELETE /api/v1/seller/productRoute/product?productId=66abcf70bd41ad01c437d3c3 - Body: {}
+2024-08-01 23:46:13 info: ::1 - - [01/Aug/2024:18:16:13 +0000] "DELETE /api/v1/seller/productRoute/product?productId=66abcf70bd41ad01c437d3c3 HTTP/1.1" 200 77 "-" "PostmanRuntime/7.40.0"
+2024-08-01 23:46:13 info: Response status: 200 - Response time: 307.17ms
+2024-08-01 23:46:21 info: Incoming request: GET /api/v1/seller/bundleRoute/bundle-details?bundleId=66abd032bd41ad01c437d3dc - Body: {}
+2024-08-01 23:46:21 info: ::1 - - [01/Aug/2024:18:16:21 +0000] "GET /api/v1/seller/bundleRoute/bundle-details?bundleId=66abd032bd41ad01c437d3dc HTTP/1.1" 200 537 "-" "PostmanRuntime/7.40.0"
+2024-08-01 23:46:21 info: Response status: 200 - Response time: 164.64ms
+2024-08-01 23:46:33 info: Incoming request: GET /api/v1/seller/productRoute/product?search=laptop&sortBy=name&sortOrder=asc&page=1&limit=6 - Body: {}
+2024-08-01 23:46:33 info: ::1 - - [01/Aug/2024:18:16:33 +0000] "GET /api/v1/seller/productRoute/product?search=laptop&sortBy=name&sortOrder=asc&page=1&limit=6 HTTP/1.1" 404 47 "-" "PostmanRuntime/7.40.0"
+2024-08-01 23:46:33 info: Response status: 404 - Response time: 80.21ms
+2024-08-01 23:46:45 info: Incoming request: GET /api/v1/seller/productRoute/product?sortBy=name&sortOrder=asc&page=1&limit=6 - Body: {}
+2024-08-01 23:46:45 info: ::1 - - [01/Aug/2024:18:16:45 +0000] "GET /api/v1/seller/productRoute/product?sortBy=name&sortOrder=asc&page=1&limit=6 HTTP/1.1" 200 938 "-" "PostmanRuntime/7.40.0"
+2024-08-01 23:46:45 info: Response status: 200 - Response time: 183.21ms
+2024-08-01 23:47:00 info: Incoming request: GET /api/v1/seller/bundleRoute/bundle-details?bundleId=66abd032bd41ad01c437d3dc - Body: {}
+2024-08-01 23:47:00 info: ::1 - - [01/Aug/2024:18:17:00 +0000] "GET /api/v1/seller/bundleRoute/bundle-details?bundleId=66abd032bd41ad01c437d3dc HTTP/1.1" 200 537 "-" "PostmanRuntime/7.40.0"
+2024-08-01 23:47:00 info: Response status: 200 - Response time: 198.37ms
+2024-08-01 23:47:10 info: Incoming request: GET /api/v1/seller/bundleRoute/bundle?search=mart&sortBy=name&sortOrder=asc&page=1&limit=6 - Body: {}
+2024-08-01 23:47:10 info: ::1 - - [01/Aug/2024:18:17:10 +0000] "GET /api/v1/seller/bundleRoute/bundle?search=mart&sortBy=name&sortOrder=asc&page=1&limit=6 HTTP/1.1" 200 1026 "-" "PostmanRuntime/7.40.0"
+2024-08-01 23:47:10 info: Response status: 200 - Response time: 169.50ms
+2024-08-01 23:49:39 info: Server is running on http://localhost:3003
+2024-08-01 23:49:40 info: MongoDB connected
+2024-08-01 23:50:17 info: Incoming request: DELETE /api/v1/seller/productRoute/product?productId=66abcf88bd41ad01c437d3c9 - Body: {}
+2024-08-01 23:50:18 info: ::1 - - [01/Aug/2024:18:20:18 +0000] "DELETE /api/v1/seller/productRoute/product?productId=66abcf88bd41ad01c437d3c9 HTTP/1.1" 200 77 "-" "PostmanRuntime/7.40.0"
+2024-08-01 23:50:18 info: Response status: 200 - Response time: 759.09ms
+2024-08-01 23:50:26 info: Incoming request: GET /api/v1/seller/bundleRoute/bundle-details?bundleId=66abd032bd41ad01c437d3dc - Body: {}
+2024-08-01 23:50:26 info: ::1 - - [01/Aug/2024:18:20:26 +0000] "GET /api/v1/seller/bundleRoute/bundle-details?bundleId=66abd032bd41ad01c437d3dc HTTP/1.1" 200 537 "-" "PostmanRuntime/7.40.0"
+2024-08-01 23:50:26 info: Response status: 200 - Response time: 182.74ms
+2024-08-01 23:53:57 info: Incoming request: GET /api/v1/seller/bundleRoute/bundle?search=mart&sortBy=name&sortOrder=asc&page=1&limit=6 - Body: {}
+2024-08-01 23:53:57 info: ::1 - - [01/Aug/2024:18:23:57 +0000] "GET /api/v1/seller/bundleRoute/bundle?search=mart&sortBy=name&sortOrder=asc&page=1&limit=6 HTTP/1.1" 200 1026 "-" "PostmanRuntime/7.40.0"
+2024-08-01 23:53:57 info: Response status: 200 - Response time: 177.17ms
+2024-08-01 23:59:12 info: Server is running on http://localhost:3003
+2024-08-01 23:59:13 info: MongoDB connected
+2024-08-01 23:59:16 info: Incoming request: GET /api/v1/seller/bundleRoute/bundle?search=mart&sortBy=name&sortOrder=asc&page=1&limit=6 - Body: {}
+2024-08-01 23:59:16 info: ::1 - - [01/Aug/2024:18:29:16 +0000] "GET /api/v1/seller/bundleRoute/bundle?search=mart&sortBy=name&sortOrder=asc&page=1&limit=6 HTTP/1.1" 200 1026 "-" "PostmanRuntime/7.40.0"
+2024-08-01 23:59:16 info: Response status: 200 - Response time: 183.51ms
+2024-08-01 23:59:23 info: Incoming request: GET /api/v1/seller/bundleRoute/bundle-details?bundleId=66abd032bd41ad01c437d3dc - Body: {}
+2024-08-01 23:59:23 info: ::1 - - [01/Aug/2024:18:29:23 +0000] "GET /api/v1/seller/bundleRoute/bundle-details?bundleId=66abd032bd41ad01c437d3dc HTTP/1.1" 200 537 "-" "PostmanRuntime/7.40.0"
+2024-08-01 23:59:23 info: Response status: 200 - Response time: 176.76ms
+2024-08-01 23:59:37 info: Incoming request: GET /api/v1/seller/productRoute/specific-product?productId=66abcf88bd41ad01c437d3c9 - Body: {}
+2024-08-01 23:59:38 info: ::1 - - [01/Aug/2024:18:29:38 +0000] "GET /api/v1/seller/productRoute/specific-product?productId=66abcf88bd41ad01c437d3c9 HTTP/1.1" 404 47 "-" "PostmanRuntime/7.40.0"
+2024-08-01 23:59:38 info: Response status: 404 - Response time: 77.19ms
+2024-08-02 00:00:03 info: Incoming request: GET /api/v1/seller/bundleRoute/bundle-details?bundleId=66abd032bd41ad01c437d3dc - Body: {}
+2024-08-02 00:00:03 info: ::1 - - [01/Aug/2024:18:30:03 +0000] "GET /api/v1/seller/bundleRoute/bundle-details?bundleId=66abd032bd41ad01c437d3dc HTTP/1.1" 200 537 "-" "PostmanRuntime/7.40.0"
+2024-08-02 00:00:03 info: Response status: 200 - Response time: 167.31ms
+2024-08-02 00:02:17 info: Server is running on http://localhost:3003
+2024-08-02 00:02:18 info: MongoDB connected
+2024-08-02 00:02:30 info: Server is running on http://localhost:3003
+2024-08-02 00:02:31 info: MongoDB connected
+2024-08-02 00:02:35 info: Server is running on http://localhost:3003
+2024-08-02 00:02:36 info: MongoDB connected
+2024-08-02 00:03:08 info: Incoming request: DELETE /api/v1/seller/productRoute/product?productId=66abcf94bd41ad01c437d3d2 - Body: {}
+2024-08-02 00:03:08 info: ::1 - - [01/Aug/2024:18:33:08 +0000] "DELETE /api/v1/seller/productRoute/product?productId=66abcf94bd41ad01c437d3d2 HTTP/1.1" 200 77 "-" "PostmanRuntime/7.40.0"
+2024-08-02 00:03:08 info: Response status: 200 - Response time: 296.23ms
+2024-08-02 00:05:19 info: Server is running on http://localhost:3003
+2024-08-02 00:05:20 info: MongoDB connected
+2024-08-02 00:08:20 info: Server is running on http://localhost:3003
+2024-08-02 00:08:22 info: MongoDB connected
+2024-08-02 00:08:24 info: Incoming request: GET /api/v1/seller/bundleRoute/bundle-details?bundleId=66abd032bd41ad01c437d3dc - Body: {}
+2024-08-02 00:08:24 info: ::1 - - [01/Aug/2024:18:38:24 +0000] "GET /api/v1/seller/bundleRoute/bundle-details?bundleId=66abd032bd41ad01c437d3dc HTTP/1.1" 200 537 "-" "PostmanRuntime/7.40.0"
+2024-08-02 00:08:24 info: Response status: 200 - Response time: 164.90ms
+2024-08-02 00:08:37 info: Incoming request: GET /api/v1/seller/productRoute/product?sortBy=name&sortOrder=asc&page=1&limit=6 - Body: {}
+2024-08-02 00:08:38 info: ::1 - - [01/Aug/2024:18:38:38 +0000] "GET /api/v1/seller/productRoute/product?sortBy=name&sortOrder=asc&page=1&limit=6 HTTP/1.1" 200 586 "-" "PostmanRuntime/7.40.0"
+2024-08-02 00:08:38 info: Response status: 200 - Response time: 182.88ms
+2024-08-02 00:08:51 info: Incoming request: PUT /api/v1/seller/bundleRoute/bundle?bundleId=66ab7fb2feb542e1ec5cb027 - Body: {"name":"Updated Bundle Name","description":"Updated description for the bundle.","products":[{"productId":"66abcf90bd41ad01c437d3cf","quantity":1}],"discountPercentage":"20"}
+2024-08-02 00:08:51 info: ::1 - - [01/Aug/2024:18:38:51 +0000] "PUT /api/v1/seller/bundleRoute/bundle?bundleId=66ab7fb2feb542e1ec5cb027 HTTP/1.1" 403 48 "-" "PostmanRuntime/7.40.0"
+2024-08-02 00:08:51 info: Response status: 403 - Response time: 92.68ms
+2024-08-02 00:09:28 info: Incoming request: PUT /api/v1/seller/bundleRoute/bundle?bundleId=66abd032bd41ad01c437d3dc - Body: {"name":"Updated Bundle Name","description":"Updated description for the bundle.","products":[{"productId":"66abcf90bd41ad01c437d3cf","quantity":1}],"discountPercentage":"20"}
+2024-08-02 00:09:28 info: ::1 - - [01/Aug/2024:18:39:28 +0000] "PUT /api/v1/seller/bundleRoute/bundle?bundleId=66abd032bd41ad01c437d3dc HTTP/1.1" 200 551 "-" "PostmanRuntime/7.40.0"
+2024-08-02 00:09:28 info: Response status: 200 - Response time: 444.24ms
+2024-08-02 00:09:47 info: Incoming request: GET /api/v1/seller/bundleRoute/bundle-details?bundleId=66abd032bd41ad01c437d3dc - Body: {}
+2024-08-02 00:09:47 info: ::1 - - [01/Aug/2024:18:39:47 +0000] "GET /api/v1/seller/bundleRoute/bundle-details?bundleId=66abd032bd41ad01c437d3dc HTTP/1.1" 200 336 "-" "PostmanRuntime/7.40.0"
+2024-08-02 00:09:47 info: Response status: 200 - Response time: 155.68ms
+2024-08-02 00:10:23 info: Incoming request: DELETE /api/v1/seller/productRoute/product?productId=66abcf90bd41ad01c437d3cf - Body: {}
+2024-08-02 00:10:24 info: ::1 - - [01/Aug/2024:18:40:24 +0000] "DELETE /api/v1/seller/productRoute/product?productId=66abcf90bd41ad01c437d3cf HTTP/1.1" 200 77 "-" "PostmanRuntime/7.40.0"
+2024-08-02 00:10:24 info: Response status: 200 - Response time: 267.73ms
+2024-08-02 00:10:30 info: Incoming request: GET /api/v1/seller/bundleRoute/bundle-details?bundleId=66abd032bd41ad01c437d3dc - Body: {}
+2024-08-02 00:10:30 info: ::1 - - [01/Aug/2024:18:40:30 +0000] "GET /api/v1/seller/bundleRoute/bundle-details?bundleId=66abd032bd41ad01c437d3dc HTTP/1.1" 200 229 "-" "PostmanRuntime/7.40.0"
+2024-08-02 00:10:30 info: Response status: 200 - Response time: 81.03ms
+2024-08-02 00:13:40 info: Server is running on http://localhost:3003
+2024-08-02 00:13:41 info: MongoDB connected
+2024-08-02 00:14:00 info: Incoming request: PUT /api/v1/seller/bundleRoute/bundle?bundleId=66abd032bd41ad01c437d3dc - Body: {"name":"Updated Bundle Name","description":"Updated description for the bundle.","products":[{"productId":"66abcf90bd41ad01c437d3cf","quantity":1}],"discountPercentage":"10"}
+2024-08-02 00:14:00 info: ::1 - - [01/Aug/2024:18:44:00 +0000] "PUT /api/v1/seller/bundleRoute/bundle?bundleId=66abd032bd41ad01c437d3dc HTTP/1.1" 200 551 "-" "PostmanRuntime/7.40.0"
+2024-08-02 00:14:00 info: Response status: 200 - Response time: 475.74ms
+2024-08-02 00:15:03 info: Incoming request: PUT /api/v1/seller/bundleRoute/bundle?bundleId=66abd032bd41ad01c437d3dc - Body: {"name":"Updated Bundle Name","description":"Updated description for the bundle.","products":[{"productId":"66abcf90bd41ad01c437d3cf","quantity":1}],"discountPercentage":"50"}
+2024-08-02 00:15:04 info: ::1 - - [01/Aug/2024:18:45:04 +0000] "PUT /api/v1/seller/bundleRoute/bundle?bundleId=66abd032bd41ad01c437d3dc HTTP/1.1" 200 551 "-" "PostmanRuntime/7.40.0"
+2024-08-02 00:15:04 info: Response status: 200 - Response time: 463.30ms
+2024-08-02 00:15:28 info: Incoming request: PUT /api/v1/seller/bundleRoute/bundle?bundleId=66abd032bd41ad01c437d3dc - Body: {"name":"Updated Bundle Name","description":"Updated description for the bundle.","products":[{"productId":"66abcf90bd41ad01c437d3cf","quantity":1}],"discount":"50"}
+2024-08-02 00:15:29 info: ::1 - - [01/Aug/2024:18:45:29 +0000] "PUT /api/v1/seller/bundleRoute/bundle?bundleId=66abd032bd41ad01c437d3dc HTTP/1.1" 200 550 "-" "PostmanRuntime/7.40.0"
+2024-08-02 00:15:29 info: Response status: 200 - Response time: 408.42ms
+2024-08-02 00:18:16 info: Server is running on http://localhost:3003
+2024-08-02 00:18:17 info: MongoDB connected
+2024-08-02 00:18:59 info: Incoming request: GET /api/v1/seller/productRoute/product?sortBy=name&sortOrder=asc&page=1&limit=6 - Body: {}
+2024-08-02 00:18:59 info: ::1 - - [01/Aug/2024:18:48:59 +0000] "GET /api/v1/seller/productRoute/product?sortBy=name&sortOrder=asc&page=1&limit=6 HTTP/1.1" 200 762 "-" "PostmanRuntime/7.40.0"
+2024-08-02 00:18:59 info: Response status: 200 - Response time: 172.11ms
+2024-08-02 00:19:10 info: Incoming request: GET /api/v1/seller/bundleRoute/bundle-details?bundleId=66abd032bd41ad01c437d3dc - Body: {}
+2024-08-02 00:19:10 info: ::1 - - [01/Aug/2024:18:49:10 +0000] "GET /api/v1/seller/bundleRoute/bundle-details?bundleId=66abd032bd41ad01c437d3dc HTTP/1.1" 200 335 "-" "PostmanRuntime/7.40.0"
+2024-08-02 00:19:10 info: Response status: 200 - Response time: 190.37ms
+2024-08-02 00:20:00 info: Incoming request: PUT /api/v1/seller/bundleRoute/bundle?bundleId=66abd032bd41ad01c437d3dc - Body: {"name":"Updated Bundle Name","description":"Updated description for the bundle.","products":[{"productId":"66abcf90bd41ad01c437d3cf","quantity":1},{"productId":"66abcf7ebd41ad01c437d3c6","quantity":1}],"discount":"50"}
+2024-08-02 00:20:00 info: ::1 - - [01/Aug/2024:18:50:00 +0000] "PUT /api/v1/seller/bundleRoute/bundle?bundleId=66abd032bd41ad01c437d3dc HTTP/1.1" 200 638 "-" "PostmanRuntime/7.40.0"
+2024-08-02 00:20:00 info: Response status: 200 - Response time: 431.95ms
+2024-08-02 00:20:21 info: Incoming request: DELETE /api/v1/seller/productRoute/product?productId=66abcf7ebd41ad01c437d3c6 - Body: {}
+2024-08-02 00:20:21 info: ::1 - - [01/Aug/2024:18:50:21 +0000] "DELETE /api/v1/seller/productRoute/product?productId=66abcf7ebd41ad01c437d3c6 HTTP/1.1" 200 77 "-" "PostmanRuntime/7.40.0"
+2024-08-02 00:20:21 info: Response status: 200 - Response time: 331.26ms
+2024-08-02 00:20:29 info: Incoming request: GET /api/v1/seller/bundleRoute/bundle-details?bundleId=66abd032bd41ad01c437d3dc - Body: {}
+2024-08-02 00:20:29 info: ::1 - - [01/Aug/2024:18:50:29 +0000] "GET /api/v1/seller/bundleRoute/bundle-details?bundleId=66abd032bd41ad01c437d3dc HTTP/1.1" 200 336 "-" "PostmanRuntime/7.40.0"
+2024-08-02 00:20:29 info: Response status: 200 - Response time: 172.37ms
+2024-08-02 00:22:22 info: Incoming request: DELETE /api/v1/seller/bundleRoute/bundle?bundleId=66abd032bd41ad01c437d3dc - Body: {}
+2024-08-02 00:22:22 info: ::1 - - [01/Aug/2024:18:52:22 +0000] "DELETE /api/v1/seller/bundleRoute/bundle?bundleId=66abd032bd41ad01c437d3dc HTTP/1.1" 200 42 "-" "PostmanRuntime/7.40.0"
+2024-08-02 00:22:22 info: Response status: 200 - Response time: 262.12ms
+2024-08-02 00:22:26 info: Incoming request: GET /api/v1/seller/bundleRoute/bundle?search=mart&sortBy=name&sortOrder=asc&page=1&limit=6 - Body: {}
+2024-08-02 00:22:26 info: ::1 - - [01/Aug/2024:18:52:26 +0000] "GET /api/v1/seller/bundleRoute/bundle?search=mart&sortBy=name&sortOrder=asc&page=1&limit=6 HTTP/1.1" 404 46 "-" "PostmanRuntime/7.40.0"
+2024-08-02 00:22:26 info: Response status: 404 - Response time: 169.90ms
+2024-08-02 00:22:31 info: Incoming request: GET /api/v1/seller/productRoute/product?sortBy=name&sortOrder=asc&page=1&limit=6 - Body: {}
+2024-08-02 00:22:31 info: ::1 - - [01/Aug/2024:18:52:31 +0000] "GET /api/v1/seller/productRoute/product?sortBy=name&sortOrder=asc&page=1&limit=6 HTTP/1.1" 200 586 "-" "PostmanRuntime/7.40.0"
+2024-08-02 00:22:31 info: Response status: 200 - Response time: 171.73ms
+2024-08-03 22:55:34 info: Server is running on http://localhost:3003
+2024-08-03 22:55:35 info: MongoDB connected
+2024-08-03 22:55:41 info: Incoming request: POST /api/v1/seller/productRoute/product - Body: {"name":"Smartphone 6","description":"smartphone 2 desc","MRP":10000,"discount":10,"quantity":10,"categoryId":"66abcf49a66c83786066a3d5"}
+2024-08-03 22:55:42 info: ::1 - - [03/Aug/2024:17:25:42 +0000] "POST /api/v1/seller/productRoute/product HTTP/1.1" 201 491 "-" "PostmanRuntime/7.40.0"
+2024-08-03 22:55:42 info: Response status: 201 - Response time: 223.74ms
+2024-08-03 22:55:59 info: Incoming request: POST /api/v1/seller/productRoute/product - Body: {"name":"Smartphone 6","description":"smartphone 2 desc","MRP":10000,"discount":10,"quantity":10,"categoryId":"66abcf49a66c83786066a3d5"}
+2024-08-03 22:55:59 info: ::1 - - [03/Aug/2024:17:25:59 +0000] "POST /api/v1/seller/productRoute/product HTTP/1.1" 201 491 "-" "PostmanRuntime/7.40.0"
+2024-08-03 22:55:59 info: Response status: 201 - Response time: 180.79ms
+2024-08-03 22:56:01 info: Incoming request: POST /api/v1/seller/productRoute/product - Body: {"name":"Smartphone 6","description":"smartphone 2 desc","MRP":10000,"discount":10,"quantity":10,"categoryId":"66abcf49a66c83786066a3d5"}
+2024-08-03 22:56:01 info: ::1 - - [03/Aug/2024:17:26:01 +0000] "POST /api/v1/seller/productRoute/product HTTP/1.1" 201 491 "-" "PostmanRuntime/7.40.0"
+2024-08-03 22:56:01 info: Response status: 201 - Response time: 160.20ms
+2024-08-03 23:03:10 info: Server is running on http://localhost:3003
+2024-08-03 23:03:11 info: MongoDB connected
+2024-08-03 23:03:20 info: Incoming request: POST /api/v1/seller/productRoute/product - Body: {"name":"Smartphone 6","description":"smartphone 2 desc","MRP":10000,"discount":10,"quantity":10,"categoryId":"66abcf49a66c83786066a3d5"}
+2024-08-03 23:03:20 info: ::1 - - [03/Aug/2024:17:33:20 +0000] "POST /api/v1/seller/productRoute/product HTTP/1.1" 403 30 "-" "PostmanRuntime/7.40.0"
+2024-08-03 23:03:20 info: Response status: 403 - Response time: 136.34ms
+2024-08-03 23:04:59 info: Incoming request: GET /api/v1/seller/bundleRoute/bundle?search=mart&sortBy=name&sortOrder=asc&page=1&limit=6 - Body: {}
+2024-08-03 23:04:59 info: ::1 - - [03/Aug/2024:17:34:59 +0000] "GET /api/v1/seller/bundleRoute/bundle?search=mart&sortBy=name&sortOrder=asc&page=1&limit=6 HTTP/1.1" 403 30 "-" "PostmanRuntime/7.40.0"
+2024-08-03 23:04:59 info: Response status: 403 - Response time: 187.51ms
+2024-08-03 23:11:09 info: Server is running on http://localhost:3003
+2024-08-03 23:11:13 info: MongoDB connected
+2024-08-03 23:11:39 info: Incoming request: GET /api/v1/seller/productRoute/product?sortBy=name&sortOrder=asc&page=1&limit=6&blocked=true - Body: {}
+2024-08-03 23:11:39 info: ::1 - - [03/Aug/2024:17:41:39 +0000] "GET /api/v1/seller/productRoute/product?sortBy=name&sortOrder=asc&page=1&limit=6&blocked=true HTTP/1.1" 403 30 "-" "PostmanRuntime/7.40.0"
+2024-08-03 23:11:39 info: Response status: 403 - Response time: 192.98ms
+2024-08-03 23:12:01 info: Incoming request: GET /api/v1/seller/productRoute/product?sortBy=name&sortOrder=asc&page=1&limit=6&blocked=true - Body: {}
+2024-08-03 23:12:01 info: ::1 - - [03/Aug/2024:17:42:01 +0000] "GET /api/v1/seller/productRoute/product?sortBy=name&sortOrder=asc&page=1&limit=6&blocked=true HTTP/1.1" 200 1088 "-" "PostmanRuntime/7.40.0"
+2024-08-03 23:12:01 info: Response status: 200 - Response time: 549.05ms
+2024-08-03 23:12:52 info: Incoming request: GET /api/v1/seller/productRoute/product?sortBy=name&sortOrder=asc&page=1&limit=6&showBlocked=true - Body: {}
+2024-08-03 23:12:52 info: ::1 - - [03/Aug/2024:17:42:52 +0000] "GET /api/v1/seller/productRoute/product?sortBy=name&sortOrder=asc&page=1&limit=6&showBlocked=true HTTP/1.1" 404 47 "-" "PostmanRuntime/7.40.0"
+2024-08-03 23:12:52 info: Response status: 404 - Response time: 210.57ms
+2024-08-03 23:13:02 info: Incoming request: GET /api/v1/seller/productRoute/product?sortBy=name&sortOrder=asc&page=1&limit=6 - Body: {}
+2024-08-03 23:13:03 info: ::1 - - [03/Aug/2024:17:43:03 +0000] "GET /api/v1/seller/productRoute/product?sortBy=name&sortOrder=asc&page=1&limit=6 HTTP/1.1" 200 1088 "-" "PostmanRuntime/7.40.0"
+2024-08-03 23:13:03 info: Response status: 200 - Response time: 238.48ms
+2024-08-03 23:13:27 info: Incoming request: GET /api/v1/seller/productRoute/product?sortBy=name&sortOrder=asc&page=1&limit=6&showBlocked=true - Body: {}
+2024-08-03 23:13:27 info: ::1 - - [03/Aug/2024:17:43:27 +0000] "GET /api/v1/seller/productRoute/product?sortBy=name&sortOrder=asc&page=1&limit=6&showBlocked=true HTTP/1.1" 200 234 "-" "PostmanRuntime/7.40.0"
+2024-08-03 23:13:27 info: Response status: 200 - Response time: 402.32ms
+2024-08-03 23:13:54 info: Server is running on http://localhost:3003
+2024-08-03 23:13:59 info: Server is running on http://localhost:3003
+2024-08-03 23:14:01 info: MongoDB connected
+2024-08-03 23:14:08 info: Server is running on http://localhost:3003
+2024-08-03 23:14:09 info: MongoDB connected
+2024-08-03 23:19:39 info: Server is running on http://localhost:3003
+2024-08-03 23:19:40 info: MongoDB connected
+2024-08-03 23:27:19 info: Server is running on http://localhost:3003
+2024-08-03 23:27:21 info: MongoDB connected
+2024-08-04 10:13:41 info: Server is running on http://localhost:3003
+2024-08-04 10:14:11 error: MongooseServerSelectionError: Could not connect to any servers in your MongoDB Atlas cluster. One common reason is that you're trying to access the database from an IP that isn't whitelisted. Make sure your current IP address is on your Atlas cluster's IP whitelist: https://www.mongodb.com/docs/atlas/security-whitelist/
+    at _handleConnectionErrors (D:\solulab\10_E_Commerce_Platform\Seller MS\node_modules\mongoose\lib\connection.js:897:11)
+    at NativeConnection.openUri (D:\solulab\10_E_Commerce_Platform\Seller MS\node_modules\mongoose\lib\connection.js:848:11)
+2024-08-04 10:48:06 info: Server is running on http://localhost:3003
+2024-08-04 10:48:08 info: MongoDB connected
+2024-08-05 10:02:29 info: Server is running on http://localhost:3003
+2024-08-05 10:02:30 info: MongoDB connected

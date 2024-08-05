@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
-import { Product } from '../../../models/index';
 import mongoose from 'mongoose';
+import { Product } from '../../../models/index';
+import Category from '../../../models/categoryModel';
 
 interface CustomRequest extends Request {
   user?: {
@@ -61,6 +62,19 @@ export const updateProduct = async (req: CustomRequest, res: Response) => {
   }
 
   try {
+    // If categoryId is provided, check if the category exists and is active
+    if (categoryId) {
+      const category = await Category.findOne({
+        _id: categoryId,
+        isActive: true,
+      });
+      if (!category) {
+        return res
+          .status(400)
+          .json({ message: 'Category does not exist or is not active' });
+      }
+    }
+
     // Calculate selling price based on MRP and discount
     let sellingPrice = MRP;
     if (discount) {
@@ -78,7 +92,7 @@ export const updateProduct = async (req: CustomRequest, res: Response) => {
         sellingPrice,
         quantity,
         categoryId,
-        updatedAt: new Date(), // Ensure updatedAt field is updated
+        updatedAt: new Date(),
       },
       { new: true }
     );

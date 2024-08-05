@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
-import { BundleProduct, Product } from '../../../models/index';
+import { Bundle, Product } from '../../../models/index';
 
 interface CustomRequest extends Request {
   user?: {
@@ -25,7 +25,7 @@ export const deleteBundle = async (req: CustomRequest, res: Response) => {
 
   try {
     // Find the bundle
-    const bundle = await BundleProduct.findById(bundleId);
+    const bundle = await Bundle.findById(bundleId);
     if (!bundle) {
       return res.status(404).json({ message: 'Bundle not found' });
     }

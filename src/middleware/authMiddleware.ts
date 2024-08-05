@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import User from '../models/userModel';
 
 interface CustomRequest extends Request {
   user?: {
@@ -9,7 +10,7 @@ interface CustomRequest extends Request {
 }
 
 // Middleware to authenticate the seller
-export const authenticateSeller = (
+export const authenticateSeller = async (
   req: CustomRequest,
   res: Response,
   next: NextFunction
@@ -30,6 +31,18 @@ export const authenticateSeller = (
       userId: decoded.userId,
       role: decoded.role,
     };
+
+    // Fetch the user
+    const user = await User.findById(decoded.userId);
+
+    if (!user) {
+      return res.status(401).json({ message: 'User not found' });
+    }
+
+    // Check if the user is blocked
+    if (user.isBlocked) {
+      return res.status(403).json({ message: 'You are blocked.' });
+    }
 
     next();
   } catch (error) {
