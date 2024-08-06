@@ -26,31 +26,27 @@ export const getAllSellerProducts = async (
     page = 1,
     limit = 5,
     category = '',
-    showBlocked = 'false', 
+    showBlocked = 'false',
   } = req.query;
-
 
   const pageNum = parseInt(page as string, 10);
   const limitNum = parseInt(limit as string, 10);
   const showBlockedProducts = showBlocked === 'true';
 
   try {
-
     const matchStage: any = {
       sellerId: new mongoose.Types.ObjectId(sellerId),
       isActive: true,
       isDeleted: false,
-      isBlocked: showBlockedProducts, 
+      isBlocked: showBlockedProducts,
       name: { $regex: search, $options: 'i' },
     };
 
-    
     if (category) {
       matchStage['category.name'] = { $regex: `^${category}$`, $options: 'i' }; // Exact match for category name
     }
 
     console.log('Match Stage:', matchStage);
-
 
     const products = await Product.aggregate([
       {
@@ -70,14 +66,14 @@ export const getAllSellerProducts = async (
       { $match: matchStage },
       {
         $project: {
-          _id: 1, 
+          _id: 1,
           name: 1,
           description: 1,
           MRP: 1,
           sellingPrice: 1,
           quantity: 1,
           discount: 1,
-          category: '$category.name', 
+          category: '$category.name',
         },
       },
       { $sort: { [sortBy as string]: sortOrder === 'desc' ? -1 : 1 } },

@@ -33,18 +33,50 @@ export const createBundle = async (req: CustomRequest, res: Response) => {
     return res.status(401).json({ message: 'Unauthorized' });
   }
 
+  // Validate name, description, discount, and products array
+  if (typeof name !== 'string' || name.trim() === '') {
+    return res.status(400).json({ message: 'Invalid name: Name is required' });
+  }
+
+  if (typeof description !== 'string' || description.trim() === '') {
+    return res
+      .status(400)
+      .json({ message: 'Invalid description: Description is required' });
+  }
+
+  if (typeof discount !== 'number' || discount < 0 || discount > 100) {
+    return res.status(400).json({
+      message: 'Invalid discount: Discount must be a number between 0 and 100',
+    });
+  }
+
+  if (!Array.isArray(products) || products.length === 0) {
+    return res
+      .status(400)
+      .json({ message: 'Products array is required and should not be empty' });
+  }
+
   try {
-    // Check if products is an array and not empty
-    if (!Array.isArray(products) || products.length === 0) {
+    // Validate product IDs and quantities
+    const productIds = products.map((p) => p.productId);
+    const invalidProductIds = productIds.filter(
+      (id) => !mongoose.Types.ObjectId.isValid(id)
+    );
+    if (invalidProductIds.length > 0) {
       return res.status(400).json({
-        message: 'Products array is required and should not be empty',
+        message: `Invalid product IDs: ${invalidProductIds.join(', ')}`,
       });
     }
 
-    // Extract product IDs
-    const productIds = products.map(
-      (p) => new mongoose.Types.ObjectId(p.productId)
+    const productQuantities = products.map((p) => p.quantity);
+    const invalidQuantities = productQuantities.filter(
+      (qty) => typeof qty !== 'number' || qty <= 0
     );
+    if (invalidQuantities.length > 0) {
+      return res.status(400).json({
+        message: 'Invalid quantities: Quantities must be positive numbers',
+      });
+    }
 
     // Fetch the active products owned by the seller that are not deleted or blocked
     const query: any = {

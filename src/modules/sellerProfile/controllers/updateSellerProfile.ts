@@ -39,27 +39,52 @@ export const updateSellerProfile = async (
   }
 
   if (shopDescription !== undefined) {
-    if (typeof shopDescription !== 'string') {
-      return res
-        .status(400)
-        .json({ message: 'Shop description must be a string' });
+    if (typeof shopDescription !== 'string' || shopDescription.length < 10) {
+      return res.status(400).json({
+        message:
+          'Shop description must be a string and at least 10 characters long',
+      });
     }
     updateFields.shopDescription = shopDescription;
   }
 
   if (shopContactNumber !== undefined) {
+    if (typeof shopContactNumber !== 'number') {
+      return res
+        .status(400)
+        .json({ message: 'Shop contact number must be a number' });
+    }
+    if (!/^\d{10,15}$/.test(shopContactNumber.toString())) {
+      return res
+        .status(400)
+        .json({ message: 'Contact number must be between 10 and 15 digits' });
+    }
     updateFields.shopContactNumber = shopContactNumber;
   }
 
   if (businessLicense !== undefined) {
+    if (typeof businessLicense !== 'string') {
+      return res
+        .status(400)
+        .json({ message: 'Business license must be a string' });
+    }
     updateFields.businessLicense = businessLicense;
   }
 
   if (taxId !== undefined) {
+    if (typeof taxId !== 'string') {
+      return res.status(400).json({ message: 'Tax ID must be a string' });
+    }
     updateFields.taxId = taxId;
   }
 
   if (website !== undefined) {
+    if (typeof website !== 'string') {
+      return res.status(400).json({ message: 'Website must be a string' });
+    }
+    if (!/^https?:\/\/[\w\-]+\.[\w\-]+/.test(website)) {
+      return res.status(400).json({ message: 'Invalid website URL' });
+    }
     updateFields.website = website;
   }
 

@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import { Product } from '../../../models/index';
-import { createProductSchema } from '../../../utils/productValidations';
 import Category from '../../../models/categoryModel';
 
 interface CustomRequest extends Request {
@@ -11,16 +10,43 @@ interface CustomRequest extends Request {
 }
 
 export const createProduct = async (req: CustomRequest, res: Response) => {
-  const { error, value } = createProductSchema.validate(req.body);
-  if (error) {
-    return res.status(400).json({ message: error.details[0].message });
-  }
+  const { name, description, MRP, discount, quantity, categoryId } = req.body;
 
-  const { name, description, MRP, discount, quantity, categoryId } = value;
   const sellerId = req.user?.userId;
 
   if (!sellerId) {
     return res.status(401).json({ message: 'Unauthorized' });
+  }
+
+  // Validate each field individually
+  if (!name || typeof name !== 'string') {
+    return res.status(400).json({ message: 'Invalid or missing product name' });
+  }
+
+  if (description !== undefined && typeof description !== 'string') {
+    return res.status(400).json({ message: 'Invalid product description' });
+  }
+
+  if (!MRP || typeof MRP !== 'number' || MRP <= 0) {
+    return res.status(400).json({ message: 'Invalid or missing MRP' });
+  }
+
+  if (
+    discount === undefined ||
+    typeof discount !== 'number' ||
+    discount < 0 ||
+    discount > 100
+  ) {
+    return res.status(400).json({ message: 'Invalid discount' });
+  }
+
+  if (
+    !quantity ||
+    typeof quantity !== 'number' ||
+    !Number.isInteger(quantity) ||
+    quantity <= 0
+  ) {
+    return res.status(400).json({ message: 'Invalid or missing quantity' });
   }
 
   if (categoryId && !mongoose.Types.ObjectId.isValid(categoryId)) {

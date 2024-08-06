@@ -44,8 +44,14 @@ export const getAllBundleProductSales = async (
     'createdBy.role': 'seller',
     isActive: true,
     isDeleted: false,
-    isBlocked: showBlockedProducts, // Show blocked products if showBlocked is true
   };
+
+  // Adjust the filter based on showBlocked parameter
+  if (showBlockedProducts) {
+    filter.isBlocked = true;
+  } else {
+    filter.isBlocked = false;
+  }
 
   // Add search filter if search query is provided
   if (searchQuery) {
@@ -70,6 +76,11 @@ export const getAllBundleProductSales = async (
         },
       },
       { $unwind: '$productDetails' },
+      {
+        $match: {
+          'productDetails.isDeleted': false,
+        },
+      },
       {
         $project: {
           _id: 1,

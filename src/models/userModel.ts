@@ -101,9 +101,9 @@ const UserSchema: Schema<IUser> = new Schema(
       type: Boolean,
       default: true,
     },
-    isBlocked:{
+    isBlocked: {
       type: Boolean,
-      default : false,
+      default: false,
     },
     blockedBy: { type: Schema.Types.ObjectId, ref: 'Admin', default: null },
     isEmailVerified: {

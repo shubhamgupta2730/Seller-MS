@@ -47,6 +47,7 @@ export const updateProduct = async (req: CustomRequest, res: Response) => {
     });
   }
 
+  // Validate discount if provided
   if (
     discount !== undefined &&
     (typeof discount !== 'number' || discount < 0 || discount > 100)
@@ -77,7 +78,7 @@ export const updateProduct = async (req: CustomRequest, res: Response) => {
 
     // Calculate selling price based on MRP and discount
     let sellingPrice = MRP;
-    if (discount) {
+    if (discount !== undefined) {
       sellingPrice = MRP - MRP * (discount / 100);
     }
 
@@ -85,20 +86,24 @@ export const updateProduct = async (req: CustomRequest, res: Response) => {
     const updatedProduct = await Product.findOneAndUpdate(
       { _id: productId, sellerId: sellerId, isActive: true },
       {
-        name,
-        description,
-        MRP,
-        discount,
-        sellingPrice,
-        quantity,
-        categoryId,
-        updatedAt: new Date(),
+        $set: {
+          name,
+          description,
+          MRP,
+          discount,
+          sellingPrice,
+          quantity,
+          categoryId: categoryId || null,
+          updatedAt: new Date(),
+        },
       },
-      { new: true }
+      { new: true, runValidators: true }
     );
 
     if (!updatedProduct) {
-      return res.status(404).json({ message: 'Product update failed' });
+      return res
+        .status(404)
+        .json({ message: 'Product not found or not active' });
     }
 
     res.status(200).json({

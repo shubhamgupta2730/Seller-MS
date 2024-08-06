@@ -41,6 +41,38 @@ export const createSellerProfile = async (
       .json({ message: 'Shop name must be at least 3 characters long' });
   }
 
+  if (shopDescription.length < 10) {
+    return res.status(400).json({
+      message: 'Shop description must be at least 10 characters long',
+    });
+  }
+
+  if (shopContactNumber && typeof shopContactNumber !== 'number') {
+    return res.status(400).json({ message: 'Invalid contact number format' });
+  }
+
+  if (shopContactNumber && !/^\d{10,15}$/.test(shopContactNumber)) {
+    return res
+      .status(400)
+      .json({ message: 'Contact number must be between 10 and 15 digits' });
+  }
+
+  if (businessLicense && typeof businessLicense !== 'string') {
+    return res.status(400).json({ message: 'Invalid business license format' });
+  }
+
+  if (taxId && typeof taxId !== 'string') {
+    return res.status(400).json({ message: 'Invalid tax ID format' });
+  }
+
+  if (website && typeof website !== 'string') {
+    return res.status(400).json({ message: 'Invalid website format' });
+  }
+
+  if (website && !/^https?:\/\/[\w\-]+\.[\w\-]+/.test(website)) {
+    return res.status(400).json({ message: 'Invalid website URL' });
+  }
+
   try {
     const newSeller = new Seller({
       userId: userId,

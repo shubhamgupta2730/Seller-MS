@@ -15,7 +15,17 @@ interface ProductInfo {
 
 export const updateBundle = async (req: CustomRequest, res: Response) => {
   const { bundleId } = req.query;
-  const { name, description, products, discount } = req.body;
+  const {
+    name,
+    description,
+    products,
+    discount,
+  }: {
+    name: string;
+    description: string;
+    products: ProductInfo[];
+    discount: number;
+  } = req.body;
   const sellerId = req.user?.userId;
 
   if (!sellerId) {
@@ -28,6 +38,37 @@ export const updateBundle = async (req: CustomRequest, res: Response) => {
     !mongoose.Types.ObjectId.isValid(bundleId)
   ) {
     return res.status(400).json({ message: 'Invalid bundle ID format' });
+  }
+
+  // Validate name, description, discount, and products array
+  if (name && (typeof name !== 'string' || name.trim() === '')) {
+    return res
+      .status(400)
+      .json({ message: 'Invalid name: Name must be a non-empty string' });
+  }
+
+  if (
+    description &&
+    (typeof description !== 'string' || description.trim() === '')
+  ) {
+    return res.status(400).json({
+      message: 'Invalid description: Description must be a non-empty string',
+    });
+  }
+
+  if (
+    discount !== undefined &&
+    (typeof discount !== 'number' || discount < 0 || discount > 100)
+  ) {
+    return res.status(400).json({
+      message: 'Invalid discount: Discount must be a number between 0 and 100',
+    });
+  }
+
+  if (products && (!Array.isArray(products) || products.length === 0)) {
+    return res
+      .status(400)
+      .json({ message: 'Products array should not be empty' });
   }
 
   try {
@@ -57,6 +98,19 @@ export const updateBundle = async (req: CustomRequest, res: Response) => {
       products.forEach((product: ProductInfo) => {
         const productId = product.productId;
         const quantity = product.quantity;
+
+        if (!mongoose.Types.ObjectId.isValid(productId)) {
+          return res
+            .status(400)
+            .json({ message: `Invalid product ID: ${productId}` });
+        }
+
+        if (typeof quantity !== 'number' || quantity <= 0) {
+          return res.status(400).json({
+            message: `Invalid quantity for product ID ${productId}: Quantity must be a positive number`,
+          });
+        }
+
         newProductIds.add(productId);
         productUpdates.set(
           productId,
@@ -102,7 +156,7 @@ export const updateBundle = async (req: CustomRequest, res: Response) => {
 
       // Calculate selling price based on discount percentage
       let sellingPrice = totalMRP;
-      if (discount) {
+      if (discount !== undefined) {
         sellingPrice = totalMRP - totalMRP * (discount / 100);
       }
 
@@ -115,7 +169,7 @@ export const updateBundle = async (req: CustomRequest, res: Response) => {
       );
       bundle.MRP = totalMRP;
       bundle.sellingPrice = sellingPrice;
-      bundle.discount = discount || bundle.discount;
+      bundle.discount = discount !== undefined ? discount : bundle.discount;
 
       // Update product references in the database
       const newProductIdsArray = Array.from(newProductIds);
@@ -150,10 +204,7 @@ export const updateBundle = async (req: CustomRequest, res: Response) => {
     if (description) bundle.description = description;
 
     await bundle.save();
-    res.status(200).json({
-      message: 'Bundle updated successfully',
-      bundle,
-    });
+    res.status(200).json({ message: 'Bundle updated successfully', bundle });
   } catch (error) {
     res.status(500).json({ message: 'Failed to update bundle', error });
   }

@@ -65,7 +65,9 @@ export const deleteProduct = async (req: CustomRequest, res: Response) => {
     console.log('Product removed from bundles:', productId);
 
     // Recalculate the total price and selling price for affected bundles
-    const bundles = await Bundle.find({ 'products.productId': productObjectId });
+    const bundles = await Bundle.find({
+      'products.productId': productObjectId,
+    });
     for (const bundle of bundles) {
       let totalMRP = 0;
 
@@ -92,7 +94,8 @@ export const deleteProduct = async (req: CustomRequest, res: Response) => {
     }
 
     res.status(200).json({
-      message: 'Product marked as deleted successfully and removed from bundles',
+      message:
+        'Product marked as deleted successfully and removed from bundles',
     });
   } catch (error) {
     console.log('Error occurred:', error);
