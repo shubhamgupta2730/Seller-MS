@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import { Bundle, Product } from '../../../models/index';
+import User from '../../../models/userModel';
 
 interface CustomRequest extends Request {
   user?: {
@@ -26,6 +27,7 @@ export const createBundle = async (req: CustomRequest, res: Response) => {
     products: ProductInfo[];
     discount: number;
   } = req.body;
+
   const userId = req.user?.userId;
   const userRole = req.user?.role;
 
@@ -101,11 +103,13 @@ export const createBundle = async (req: CustomRequest, res: Response) => {
 
     let totalMRP = 0;
     const productPriceMap: { [key: string]: number } = {};
+    const productNameMap: { [key: string]: string } = {};
 
-    // Store prices of owned products
+    // Store prices and names of owned products
     ownedProducts.forEach((product) => {
       const productId = (product._id as mongoose.Types.ObjectId).toString();
       productPriceMap[productId] = product.MRP;
+      productNameMap[productId] = product.name;
     });
 
     // Calculate total MRP and validate quantities
@@ -161,9 +165,34 @@ export const createBundle = async (req: CustomRequest, res: Response) => {
       { $set: { bundleId: savedBundle._id } }
     );
 
+    // Fetch the seller's name
+    const seller = await User.findById(userId).select('firstName lastName');
+    const sellerName = seller ? `${seller.firstName} ${seller.lastName}` : null;
+
+    // Generate the response with product names
+    const response = {
+      _id: savedBundle._id,
+      name: savedBundle.name,
+      description: savedBundle.description,
+      MRP: savedBundle.MRP,
+      sellingPrice: savedBundle.sellingPrice,
+      discount: savedBundle.discount,
+      products: products.map((p) => ({
+        productId: p.productId,
+        productName: productNameMap[p.productId],
+        quantity: p.quantity,
+      })),
+      createdBy: {
+        _id: userId,
+        name: sellerName,
+      },
+      createdAt: savedBundle.createdAt,
+      updatedAt: savedBundle.updatedAt,
+    };
+
     res.status(201).json({
       message: 'Bundle created successfully',
-      bundle: savedBundle,
+      bundle: response,
     });
   } catch (error) {
     res.status(500).json({ message: 'Failed to create bundle', error });

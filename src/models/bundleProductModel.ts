@@ -11,6 +11,7 @@ interface IBundleProduct extends Document {
   MRP: number;
   sellingPrice: number;
   discount: number;
+  adminDiscount?: number;
   products: { productId: mongoose.Types.ObjectId; quantity: number }[];
   sellerId?: Schema.Types.ObjectId;
   adminId?: Schema.Types.ObjectId;
@@ -29,6 +30,7 @@ const bundleProductSchema = new Schema<IBundleProduct>({
   MRP: { type: Number, required: true },
   sellingPrice: { type: Number, required: true },
   discount: { type: Number, required: true },
+  adminDiscount: { type: Number, default: 0 },
   products: [
     {
       productId: {

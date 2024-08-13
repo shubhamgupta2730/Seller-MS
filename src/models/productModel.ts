@@ -7,6 +7,7 @@ interface IProduct extends Document {
   sellingPrice: number;
   quantity: number;
   discount: number;
+  adminDiscount: number;
   categoryId: Types.ObjectId | null;
   sellerId: Types.ObjectId;
   bundleId: Types.ObjectId;
@@ -22,10 +23,11 @@ interface IProduct extends Document {
 const productSchema = new Schema<IProduct>({
   name: { type: String, required: true },
   description: { type: String, required: true },
-  MRP: { type: Number, required: true },
+  MRP: { type: Number, required: true },  
   sellingPrice: { type: Number, default: 0 },
-  quantity: { type: Number, required: true },
+  quantity: { type: Number, required: true }, 
   discount: { type: Number, default: 0 },
+  adminDiscount: { type: Number, default: 0 }, //admin discount
   categoryId: { type: Schema.Types.ObjectId, ref: 'Category', default: null },
   sellerId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   bundleId: { type: Schema.Types.ObjectId, ref: 'Bundle', default: null },

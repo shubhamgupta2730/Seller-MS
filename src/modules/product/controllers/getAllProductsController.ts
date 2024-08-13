@@ -63,6 +63,20 @@ export const getAllSellerProducts = async (
           preserveNullAndEmptyArrays: true,
         },
       },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'sellerId',
+          foreignField: '_id',
+          as: 'seller',
+        },
+      },
+      {
+        $unwind: {
+          path: '$seller',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
       { $match: matchStage },
       {
         $project: {
@@ -74,6 +88,9 @@ export const getAllSellerProducts = async (
           quantity: 1,
           discount: 1,
           category: '$category.name',
+          sellerName: {
+            $concat: ['$seller.firstName', ' ', '$seller.lastName']
+          }
         },
       },
       { $sort: { [sortBy as string]: sortOrder === 'desc' ? -1 : 1 } },

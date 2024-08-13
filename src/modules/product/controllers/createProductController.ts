@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import { Product } from '../../../models/index';
 import Category from '../../../models/categoryModel';
+import User from '../../../models/userModel';
+import Seller from '../../../models/sellerModel';
 
 interface CustomRequest extends Request {
   user?: {
@@ -83,11 +85,38 @@ export const createProduct = async (req: CustomRequest, res: Response) => {
 
     await newProduct.save();
 
+    // Fetch the seller's name from the User collection
+
+    const seller = await User.findById(sellerId).select('firstName lastName');
+    if(!seller?.firstName || !seller.lastName){
+      return res.status(401).json({message: 'Name not found'})
+    }
+    const sellerName = seller?.firstName +" "+ seller?.lastName
+
+    // Filter the response fields
+    const response = {
+      _id: newProduct._id,
+      name: newProduct.name,
+      description: newProduct.description,
+      MRP: newProduct.MRP,
+      sellingPrice: newProduct.sellingPrice,
+      quantity: newProduct.quantity,
+      discount: newProduct.discount,
+      categoryId: newProduct.categoryId,
+      createdBy: {
+        _id: sellerId,
+        name: seller ? sellerName  : null,
+      },
+      createdAt: newProduct.createdAt,
+      updatedAt: newProduct.updatedAt,
+    };
+
     res.status(201).json({
       message: 'Product created successfully',
-      product: newProduct,
+      product: response,
     });
   } catch (error) {
+    console.error('Failed to create product:', error);
     res.status(500).json({ message: 'Failed to create product', error });
   }
 };

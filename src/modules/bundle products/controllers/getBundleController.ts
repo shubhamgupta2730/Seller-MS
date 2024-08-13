@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import { Bundle } from '../../../models/index';
+import User from '../../../models/userModel';
 
 // Define an interface for the Product schema
 interface ProductDetails {
@@ -65,6 +66,10 @@ export const getBundleDetails = async (req: CustomRequest, res: Response) => {
         .json({ message: 'Bundle not found or unauthorized' });
     }
 
+    // Fetch the seller's information
+    const seller = await User.findById(sellerId).select('firstName lastName');
+    const sellerName = seller ? `${seller.firstName} ${seller.lastName}` : null;
+
     const response = {
       _id: bundle._id,
       name: bundle.name,
@@ -74,11 +79,17 @@ export const getBundleDetails = async (req: CustomRequest, res: Response) => {
       discount: bundle.discount,
       products: bundle.products.map((product) => ({
         productId: product.productId._id,
-        quantity: product.quantity,
         name: product.productId.name,
         MRP: product.productId.MRP,
         sellingPrice: product.productId.sellingPrice,
+        quantity: product.quantity,
       })),
+      createdBy: {
+        _id: sellerId,
+        name: sellerName,
+      },
+      createdAt: bundle.createdAt,
+      updatedAt: bundle.updatedAt,
     };
 
     res.status(200).json({

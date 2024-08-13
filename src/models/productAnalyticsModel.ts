@@ -2,7 +2,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 interface IProductAnalytics extends Document {
   productId: Schema.Types.ObjectId;
-  sellerAuthId: Schema.Types.ObjectId;
+  sellerId: Schema.Types.ObjectId;
   views: number;
   clicks: number;
   purchases: number;
@@ -12,7 +12,7 @@ interface IProductAnalytics extends Document {
 
 const productAnalyticsSchema = new Schema<IProductAnalytics>({
   productId: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
-  sellerAuthId: { type: Schema.Types.ObjectId, ref: 'Auth', required: true },
+  sellerId: { type: Schema.Types.ObjectId, ref: 'Auth', required: true },
   views: { type: Number, required: true },
   clicks: { type: Number, required: true },
   purchases: { type: Number, required: true },

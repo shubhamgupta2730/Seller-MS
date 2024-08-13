@@ -89,9 +89,14 @@ export const getAllBundleProductSales = async (
           MRP: 1,
           sellingPrice: 1,
           discount: 1,
-          'products.productId': 1,
-          'products.quantity': 1,
           isBlocked: 1, // Include isBlocked in the projection
+          products: {
+            productId: 1,
+            quantity: 1,
+            name: '$productDetails.name',
+            MRP: '$productDetails.MRP',
+            sellingPrice: '$productDetails.sellingPrice',
+          },
         },
       },
       { $sort: sortCriteria },
@@ -113,7 +118,22 @@ export const getAllBundleProductSales = async (
 
     // Return the bundles with pagination info
     res.status(200).json({
-      bundles,
+      bundles: bundles.map((bundle: any) => ({
+        _id: bundle._id,
+        name: bundle.name,
+        description: bundle.description,
+        MRP: bundle.MRP,
+        sellingPrice: bundle.sellingPrice,
+        discount: bundle.discount,
+        isBlocked: bundle.isBlocked,
+        products: bundle.products.map((product: any) => ({
+          productId: product.productId,
+          quantity: product.quantity,
+          name: product.name,
+          MRP: product.MRP,
+          sellingPrice: product.sellingPrice,
+        })),
+      })),
       pagination: {
         total: totalBundles,
         page: pageNum,
@@ -121,8 +141,9 @@ export const getAllBundleProductSales = async (
       },
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: 'Failed to retrieve bundle product sales', error });
+    res.status(500).json({
+      message: 'Failed to retrieve bundle product sales',
+      error,
+    });
   }
 };

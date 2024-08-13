@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import { Bundle, Product } from '../../../models/index';
+import User from '../../../models/userModel';
 
 interface CustomRequest extends Request {
   user?: {
@@ -84,12 +85,14 @@ export const updateBundle = async (req: CustomRequest, res: Response) => {
         .json({ message: 'Unauthorized to update this bundle' });
     }
 
-    // Track old product IDs and quantities
     const oldProductsMap = new Map(
       bundle.products.map((p) => [p.productId.toString(), p.quantity])
     );
 
-    // Validate and add/update products in the bundle
+    let totalMRP = 0;
+    const productPriceMap: { [key: string]: number } = {};
+    const productNameMap: { [key: string]: string } = {};
+
     if (products && Array.isArray(products)) {
       const newProductIds = new Set<string>();
       const productUpdates = new Map<string, number>();
@@ -124,26 +127,25 @@ export const updateBundle = async (req: CustomRequest, res: Response) => {
         _id: { $in: productIds },
         sellerId: new mongoose.Types.ObjectId(sellerId),
         isActive: true,
+        isDeleted: false,
+        isBlocked: false,
       });
 
       if (ownedProducts.length !== productIds.length) {
         return res.status(403).json({
           message:
-            'Unauthorized to update one or more products or products are not active',
+            'Unauthorized to update one or more products or products are not active, deleted, or blocked',
         });
       }
 
-      // Calculate the total MRP for the updated bundle
-      let totalMRP = 0;
-      const productPriceMap: { [key: string]: number } = {};
-
-      // Store prices of owned products
+      // Store prices and names of owned products
       ownedProducts.forEach((product) => {
         const productId = (product._id as mongoose.Types.ObjectId).toString();
         productPriceMap[productId] = product.MRP;
+        productNameMap[productId] = product.name;
       });
 
-      // Calculate total MRP and validate quantities
+      // Calculate total MRP
       for (const [productId, quantity] of productUpdates.entries()) {
         if (!productPriceMap[productId]) {
           return res
@@ -154,10 +156,10 @@ export const updateBundle = async (req: CustomRequest, res: Response) => {
         totalMRP += productPriceMap[productId] * quantity;
       }
 
-      // Calculate selling price based on discount percentage
+      // Calculate the selling price based on the updated discount
       let sellingPrice = totalMRP;
       if (discount !== undefined) {
-        sellingPrice = totalMRP - totalMRP * (discount / 100);
+        sellingPrice = totalMRP - (totalMRP * discount) / 100;
       }
 
       // Update the bundle's product, price, and discount details
@@ -204,7 +206,33 @@ export const updateBundle = async (req: CustomRequest, res: Response) => {
     if (description) bundle.description = description;
 
     await bundle.save();
-    res.status(200).json({ message: 'Bundle updated successfully', bundle });
+
+    // Fetch the seller's name
+    const seller = await User.findById(sellerId).select('firstName lastName');
+    const sellerName = seller ? `${seller.firstName} ${seller.lastName}` : null;
+
+    // Generate the response with product names
+    const response = {
+      _id: bundle._id,
+      name: bundle.name,
+      description: bundle.description,
+      MRP: bundle.MRP,
+      sellingPrice: bundle.sellingPrice,
+      discount: bundle.discount,
+      products: bundle.products.map((p) => ({
+        productId: p.productId.toString(),
+        productName: productNameMap[p.productId.toString()],
+        quantity: p.quantity,
+      })),
+      createdBy: {
+        _id: sellerId,
+        name: sellerName,
+      },
+      createdAt: bundle.createdAt,
+      updatedAt: bundle.updatedAt,
+    };
+
+    res.status(200).json({ message: 'Bundle updated successfully', bundle: response });
   } catch (error) {
     res.status(500).json({ message: 'Failed to update bundle', error });
   }

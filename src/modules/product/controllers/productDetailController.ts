@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import { Product } from '../../../models/index';
+import User from '../../../models/userModel';
 
 interface CustomRequest extends Request {
   user?: {
@@ -51,7 +52,21 @@ export const getProductDetails = async (req: CustomRequest, res: Response) => {
       {
         $unwind: {
           path: '$category',
-          preserveNullAndEmptyArrays: true, // To include products without a category
+          preserveNullAndEmptyArrays: true, 
+        },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'sellerId',
+          foreignField: '_id',
+          as: 'seller',
+        },
+      },
+      {
+        $unwind: {
+          path: '$seller',
+          preserveNullAndEmptyArrays: true,
         },
       },
       {
@@ -64,6 +79,9 @@ export const getProductDetails = async (req: CustomRequest, res: Response) => {
           quantity: 1,
           discount: 1,
           category: '$category.name',
+          sellerName: {
+            $concat: ['$seller.firstName', ' ', '$seller.lastName']
+          }
         },
       },
     ]);
