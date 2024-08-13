@@ -36,7 +36,7 @@ export const createBundle = async (req: CustomRequest, res: Response) => {
   }
 
   // Validate name, description, discount, and products array
-  if (typeof name !== 'string' || name.trim() === '') {
+  if (!name || typeof name !== 'string' || name.trim() === '') {
     return res.status(400).json({ message: 'Invalid name: Name is required' });
   }
 
@@ -55,7 +55,7 @@ export const createBundle = async (req: CustomRequest, res: Response) => {
   if (!Array.isArray(products) || products.length === 0) {
     return res
       .status(400)
-      .json({ message: 'Products array is required and should not be empty' });
+      .json({ message: 'Products  are required to create a bundle' });
   }
 
   try {
@@ -177,17 +177,17 @@ export const createBundle = async (req: CustomRequest, res: Response) => {
       MRP: savedBundle.MRP,
       sellingPrice: savedBundle.sellingPrice,
       discount: savedBundle.discount,
-      products: products.map((p) => ({
-        productId: p.productId,
-        productName: productNameMap[p.productId],
-        quantity: p.quantity,
-      })),
-      createdBy: {
-        _id: userId,
-        name: sellerName,
-      },
-      createdAt: savedBundle.createdAt,
-      updatedAt: savedBundle.updatedAt,
+      // products: products.map((p) => ({
+      //   productId: p.productId,
+      //   productName: productNameMap[p.productId],
+      //   quantity: p.quantity,
+      // })),
+      // createdBy: {
+      //   _id: userId,
+      //   name: sellerName,
+      // },
+      // createdAt: savedBundle.createdAt,
+      // updatedAt: savedBundle.updatedAt,
     };
 
     res.status(201).json({

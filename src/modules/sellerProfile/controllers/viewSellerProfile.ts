@@ -19,7 +19,8 @@ export const viewSellerProfile = async (req: CustomRequest, res: Response) => {
       return res.status(404).json({ message: 'Seller profile not found' });
     }
 
-    const sellers = {
+    const seller = {
+      _id: sellerProfile._id,
       shopName: sellerProfile.shopName,
       shopDescription: sellerProfile.shopDescription,
       shopContactNumber: sellerProfile.shopContactNumber,
@@ -30,7 +31,7 @@ export const viewSellerProfile = async (req: CustomRequest, res: Response) => {
 
     return res.status(200).json({
       message: 'Seller profile',
-      sellers,
+      seller,
     });
   } catch (error) {
     return res.status(500).json({

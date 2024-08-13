@@ -24,7 +24,7 @@ router.get(
   viewSellerProfile
 );
 
-router.put(
+router.patch(
   '/update-profile',
   authenticateSeller,
   authorizeSeller,

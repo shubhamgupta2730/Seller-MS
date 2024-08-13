@@ -121,18 +121,18 @@ export const getAllBundleProductSales = async (
       bundles: bundles.map((bundle: any) => ({
         _id: bundle._id,
         name: bundle.name,
-        description: bundle.description,
+        // description: bundle.description,
         MRP: bundle.MRP,
         sellingPrice: bundle.sellingPrice,
         discount: bundle.discount,
-        isBlocked: bundle.isBlocked,
-        products: bundle.products.map((product: any) => ({
-          productId: product.productId,
-          quantity: product.quantity,
-          name: product.name,
-          MRP: product.MRP,
-          sellingPrice: product.sellingPrice,
-        })),
+        // isBlocked: bundle.isBlocked,
+        // products: bundle.products.map((product: any) => ({
+        //   productId: product.productId,
+        //   quantity: product.quantity,
+        //   name: product.name,
+        //   MRP: product.MRP,
+        //   sellingPrice: product.sellingPrice,
+        // })),
       })),
       pagination: {
         total: totalBundles,

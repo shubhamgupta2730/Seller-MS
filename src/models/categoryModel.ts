@@ -5,6 +5,7 @@ export interface ICategory extends Document {
   description: string;
   isActive: boolean;
   createdBy: Schema.Types.ObjectId;
+  productIds: Schema.Types.ObjectId[]; 
 }
 
 const categorySchema: Schema<ICategory> = new Schema(
@@ -12,7 +13,6 @@ const categorySchema: Schema<ICategory> = new Schema(
     name: {
       type: String,
       required: true,
-      unique: true,
     },
     description: {
       type: String,
@@ -26,6 +26,12 @@ const categorySchema: Schema<ICategory> = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'Admin',
     },
+    productIds: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Product', 
+      },
+    ], 
   },
   { timestamps: true }
 );

@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import { Product } from '../../../models/index';
-import User from '../../../models/userModel';
 
 interface CustomRequest extends Request {
   user?: {
@@ -20,7 +19,7 @@ export const getProductDetails = async (req: CustomRequest, res: Response) => {
 
   if (!sellerId) {
     console.log('Seller ID is missing from the request');
-    return res.status(400).json({ message: 'Seller ID is missing' });
+    return res.status(400).json({ message: 'Seller ID is required' });
   }
 
   if (
@@ -70,18 +69,35 @@ export const getProductDetails = async (req: CustomRequest, res: Response) => {
         },
       },
       {
+        $lookup: {
+          from: 'bundles',
+          localField: 'bundleId',
+          foreignField: '_id',
+          as: 'bundle',
+        },
+      },
+      {
+        $unwind: {
+          path: '$bundle',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
         $project: {
-          _id: 0,
+          _id: 1,
           name: 1,
           description: 1,
           MRP: 1,
           sellingPrice: 1,
           quantity: 1,
           discount: 1,
-          category: '$category.name',
           sellerName: {
             $concat: ['$seller.firstName', ' ', '$seller.lastName']
-          }
+          },
+          categoryId: '$category._id',
+          category: '$category.name',
+          bundleId: '$bundle._id',
+          bundleName: '$bundle.name',
         },
       },
     ]);

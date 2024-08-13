@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import { Product, Bundle } from '../../../models/index';
+import Category from '../../../models/categoryModel';
 
 interface CustomRequest extends Request {
   user?: {
@@ -12,10 +13,7 @@ export const deleteProduct = async (req: CustomRequest, res: Response) => {
   const { productId } = req.query;
   const sellerId = req.user?.userId;
 
-  console.log('Received request to delete product:', productId);
-  console.log('Seller ID:', sellerId);
 
-  // Validate productId format
   if (
     typeof productId !== 'string' ||
     !mongoose.Types.ObjectId.isValid(productId)
@@ -24,17 +22,16 @@ export const deleteProduct = async (req: CustomRequest, res: Response) => {
     return res.status(400).json({ message: 'Invalid product ID format' });
   }
 
-  // Validate sellerId
+
   if (!sellerId) {
     console.log('Unauthorized request: Missing seller ID');
     return res.status(401).json({ message: 'Unauthorized' });
   }
 
   try {
-    // Convert productId to ObjectId
+
     const productObjectId = new mongoose.Types.ObjectId(productId);
 
-    // Find the product by ID and sellerId
     const product = await Product.findOne({
       _id: productObjectId,
       sellerId: sellerId,
@@ -48,23 +45,14 @@ export const deleteProduct = async (req: CustomRequest, res: Response) => {
         .json({ message: 'Product not found or unauthorized' });
     }
 
-    console.log('Product found:', product);
-
-    // Mark product as deleted
     product.isDeleted = true;
     await product.save();
-    console.log('Product marked as deleted:', productId);
 
-    // Remove the product from bundles
     const result = await Bundle.updateMany(
       { 'products.productId': productObjectId },
       { $pull: { products: { productId: productObjectId } } }
     );
 
-    console.log('Update result:', result);
-    console.log('Product removed from bundles:', productId);
-
-    // Recalculate the total price and selling price for affected bundles
     const bundles = await Bundle.find({
       'products.productId': productObjectId,
     });
@@ -85,17 +73,22 @@ export const deleteProduct = async (req: CustomRequest, res: Response) => {
         sellingPrice = totalMRP - totalMRP * (bundle.discount / 100);
       }
 
-      // Update bundle with new prices
+
       bundle.MRP = totalMRP;
       bundle.sellingPrice = sellingPrice;
 
       await bundle.save();
-      console.log(`Bundle ${bundle._id} updated with new prices.`);
+    }
+
+    if (product.categoryId) {
+      await Category.updateOne(
+        { _id: product.categoryId },
+        { $pull: { productIds: productObjectId } }
+      );
     }
 
     res.status(200).json({
-      message:
-        'Product marked as deleted successfully and removed from bundles',
+      message: 'Product removed successfully',
     });
   } catch (error) {
     console.log('Error occurred:', error);

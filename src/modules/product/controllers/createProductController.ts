@@ -1,9 +1,7 @@
 import { Request, Response } from 'express';
-import mongoose from 'mongoose';
+import mongoose, { Schema, Types } from 'mongoose';
 import { Product } from '../../../models/index';
 import Category from '../../../models/categoryModel';
-import User from '../../../models/userModel';
-import Seller from '../../../models/sellerModel';
 
 interface CustomRequest extends Request {
   user?: {
@@ -13,14 +11,12 @@ interface CustomRequest extends Request {
 
 export const createProduct = async (req: CustomRequest, res: Response) => {
   const { name, description, MRP, discount, quantity, categoryId } = req.body;
-
   const sellerId = req.user?.userId;
 
   if (!sellerId) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
 
-  // Validate each field individually
   if (!name || typeof name !== 'string') {
     return res.status(400).json({ message: 'Invalid or missing product name' });
   }
@@ -56,15 +52,15 @@ export const createProduct = async (req: CustomRequest, res: Response) => {
   }
 
   try {
+    let category = null;
     if (categoryId) {
-      const category = await Category.findOne({
+      category = await Category.findOne({
         _id: categoryId,
         isActive: true,
       });
+
       if (!category) {
-        return res
-          .status(400)
-          .json({ message: 'Category does not exist or is not active' });
+        return res.status(400).json({ message: 'Category does not exist ' });
       }
     }
 
@@ -83,32 +79,25 @@ export const createProduct = async (req: CustomRequest, res: Response) => {
       createdBy: sellerId,
     });
 
-    await newProduct.save();
+    // Save the new product to the database
+    const savedProduct = await newProduct.save();
 
-    // Fetch the seller's name from the User collection
-
-    const seller = await User.findById(sellerId).select('firstName lastName');
-    if(!seller?.firstName || !seller.lastName){
-      return res.status(401).json({message: 'Name not found'})
+    // If categoryId is provided, update the Category's productIds array
+    if (categoryId && category) {
+      category.productIds.push(savedProduct._id as Schema.Types.ObjectId);
+      await category.save();
     }
-    const sellerName = seller?.firstName +" "+ seller?.lastName
 
     // Filter the response fields
     const response = {
-      _id: newProduct._id,
-      name: newProduct.name,
-      description: newProduct.description,
-      MRP: newProduct.MRP,
-      sellingPrice: newProduct.sellingPrice,
-      quantity: newProduct.quantity,
-      discount: newProduct.discount,
-      categoryId: newProduct.categoryId,
-      createdBy: {
-        _id: sellerId,
-        name: seller ? sellerName  : null,
-      },
-      createdAt: newProduct.createdAt,
-      updatedAt: newProduct.updatedAt,
+      _id: savedProduct._id,
+      name: savedProduct.name,
+      description: savedProduct.description,
+      MRP: savedProduct.MRP,
+      sellingPrice: savedProduct.sellingPrice,
+      quantity: savedProduct.quantity,
+      discount: savedProduct.discount,
+      categoryId: savedProduct.categoryId,
     };
 
     res.status(201).json({

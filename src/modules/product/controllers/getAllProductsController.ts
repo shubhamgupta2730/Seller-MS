@@ -82,15 +82,16 @@ export const getAllSellerProducts = async (
         $project: {
           _id: 1,
           name: 1,
-          description: 1,
+          // description: 1,
           MRP: 1,
           sellingPrice: 1,
-          quantity: 1,
+          // quantity: 1,
           discount: 1,
+          categoryId: '$category._id',
           category: '$category.name',
-          sellerName: {
-            $concat: ['$seller.firstName', ' ', '$seller.lastName']
-          }
+          // sellerName: {
+          //   $concat: ['$seller.firstName', ' ', '$seller.lastName']
+          // }
         },
       },
       { $sort: { [sortBy as string]: sortOrder === 'desc' ? -1 : 1 } },

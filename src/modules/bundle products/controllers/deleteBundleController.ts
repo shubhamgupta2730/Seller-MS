@@ -25,7 +25,7 @@ export const deleteBundle = async (req: CustomRequest, res: Response) => {
 
   try {
     // Find the bundle
-    const bundle = await Bundle.findById(bundleId);
+    const bundle = await Bundle.findOne({_id: bundleId, isActive: true, isBlocked:false, isDeleted: false});
     if (!bundle) {
       return res.status(404).json({ message: 'Bundle not found' });
     }

@@ -26,7 +26,7 @@ router.get(
   authorizeSeller,
   getProductDetails
 );
-router.put('/product', authenticateSeller, authorizeSeller, updateProduct);
+router.patch('/product', authenticateSeller, authorizeSeller, updateProduct);
 router.delete('/product', authenticateSeller, authorizeSeller, deleteProduct);
 
 export default router;

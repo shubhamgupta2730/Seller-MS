@@ -84,12 +84,12 @@ export const getBundleDetails = async (req: CustomRequest, res: Response) => {
         sellingPrice: product.productId.sellingPrice,
         quantity: product.quantity,
       })),
-      createdBy: {
-        _id: sellerId,
-        name: sellerName,
-      },
-      createdAt: bundle.createdAt,
-      updatedAt: bundle.updatedAt,
+      // createdBy: {
+      //   _id: sellerId,
+      //   name: sellerName,
+      // },
+      // createdAt: bundle.createdAt,
+      // updatedAt: bundle.updatedAt,
     };
 
     res.status(200).json({
