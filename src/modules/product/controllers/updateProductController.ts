@@ -35,6 +35,16 @@ export const updateProduct = async (req: CustomRequest, res: Response) => {
       .json({ message: 'Product not found or unauthorized' });
   }
 
+  // Check if a product with the same name already exists
+  if (name) {
+    const existingProduct = await Product.findOne({ name, sellerId });
+    if (existingProduct) {
+      return res
+        .status(400)
+        .json({ message: 'A product with this name already exists' });
+    }
+  }
+
   // Validate sellerId
   if (!sellerId) {
     return res.status(400).json({ message: 'Seller ID is required' });
@@ -75,7 +85,7 @@ export const updateProduct = async (req: CustomRequest, res: Response) => {
     if (!mongoose.Types.ObjectId.isValid(categoryId)) {
       return res.status(400).json({ message: 'Invalid category ID format' });
     }
-    
+
     // Check if the category exists and is active
     const category = await Category.findOne({
       _id: categoryId,
@@ -132,7 +142,11 @@ export const updateProduct = async (req: CustomRequest, res: Response) => {
     }
 
     // Handle category updates
-    if (currentProduct.categoryId && currentProduct.categoryId.toString() !== updateFields.categoryId?.toString()) {
+    if (
+      currentProduct.categoryId &&
+      currentProduct.categoryId.toString() !==
+        updateFields.categoryId?.toString()
+    ) {
       // Remove product ID from old category
       await Category.updateOne(
         { _id: currentProduct.categoryId },

@@ -10,11 +10,6 @@ interface CustomRequest extends Request {
   };
 }
 
-interface ProductInfo {
-  productId: string;
-  quantity: number;
-}
-
 export const createBundle = async (req: CustomRequest, res: Response) => {
   const {
     name,
@@ -24,7 +19,7 @@ export const createBundle = async (req: CustomRequest, res: Response) => {
   }: {
     name: string;
     description: string;
-    products: ProductInfo[];
+    products: string[];
     discount: number;
   } = req.body;
 
@@ -55,13 +50,12 @@ export const createBundle = async (req: CustomRequest, res: Response) => {
   if (!Array.isArray(products) || products.length === 0) {
     return res
       .status(400)
-      .json({ message: 'Products  are required to create a bundle' });
+      .json({ message: 'Products are required to create a bundle' });
   }
 
   try {
-    // Validate product IDs and quantities
-    const productIds = products.map((p) => p.productId);
-    const invalidProductIds = productIds.filter(
+    // Validate product IDs
+    const invalidProductIds = products.filter(
       (id) => !mongoose.Types.ObjectId.isValid(id)
     );
     if (invalidProductIds.length > 0) {
@@ -70,19 +64,9 @@ export const createBundle = async (req: CustomRequest, res: Response) => {
       });
     }
 
-    const productQuantities = products.map((p) => p.quantity);
-    const invalidQuantities = productQuantities.filter(
-      (qty) => typeof qty !== 'number' || qty <= 0
-    );
-    if (invalidQuantities.length > 0) {
-      return res.status(400).json({
-        message: 'Invalid quantities: Quantities must be positive numbers',
-      });
-    }
-
-    // Fetch the active products owned by the seller that are not deleted or blocked
+    // Fetch the active products owned by the seller/admin that are not deleted or blocked
     const query: any = {
-      _id: { $in: productIds },
+      _id: { $in: products },
       isActive: true,
       isDeleted: false,
       isBlocked: false,
@@ -94,38 +78,15 @@ export const createBundle = async (req: CustomRequest, res: Response) => {
     const ownedProducts = await Product.find(query).exec();
 
     // Check if the fetched products match the provided product IDs
-    if (ownedProducts.length !== productIds.length) {
+    if (ownedProducts.length !== products.length) {
       return res.status(403).json({
         message:
           'Unauthorized to bundle one or more products or products are not active, deleted, or blocked',
       });
     }
 
-    let totalMRP = 0;
-    const productPriceMap: { [key: string]: number } = {};
-    const productNameMap: { [key: string]: string } = {};
-
-    // Store prices and names of owned products
-    ownedProducts.forEach((product) => {
-      const productId = (product._id as mongoose.Types.ObjectId).toString();
-      productPriceMap[productId] = product.MRP;
-      productNameMap[productId] = product.name;
-    });
-
-    // Calculate total MRP and validate quantities
-    for (const productInfo of products) {
-      const productId = productInfo.productId;
-      const quantity = productInfo.quantity;
-
-      if (!productPriceMap[productId]) {
-        return res
-          .status(404)
-          .json({ message: `Product with ID ${productId} not found` });
-      }
-
-      // Add to total MRP
-      totalMRP += productPriceMap[productId] * quantity;
-    }
+    // Calculate total MRP
+    let totalMRP = ownedProducts.reduce((sum, product) => sum + product.MRP, 0);
 
     // Calculate selling price based on discount percentage
     let sellingPrice = totalMRP;
@@ -140,9 +101,8 @@ export const createBundle = async (req: CustomRequest, res: Response) => {
       MRP: totalMRP,
       sellingPrice,
       discount,
-      products: products.map((p) => ({
-        productId: new mongoose.Types.ObjectId(p.productId),
-        quantity: p.quantity,
+      products: products.map((productId) => ({
+        productId: new mongoose.Types.ObjectId(productId),
       })),
       sellerId:
         userRole === 'seller' ? new mongoose.Types.ObjectId(userId) : undefined,
@@ -161,8 +121,8 @@ export const createBundle = async (req: CustomRequest, res: Response) => {
 
     // Update products to reference the new bundle
     await Product.updateMany(
-      { _id: { $in: productIds } },
-      { $set: { bundleId: savedBundle._id } }
+      { _id: { $in: products } },
+      { $push: { bundleIds: savedBundle._id } } 
     );
 
     // Fetch the seller's name
@@ -177,17 +137,17 @@ export const createBundle = async (req: CustomRequest, res: Response) => {
       MRP: savedBundle.MRP,
       sellingPrice: savedBundle.sellingPrice,
       discount: savedBundle.discount,
-      // products: products.map((p) => ({
-      //   productId: p.productId,
-      //   productName: productNameMap[p.productId],
-      //   quantity: p.quantity,
-      // })),
-      // createdBy: {
-      //   _id: userId,
-      //   name: sellerName,
-      // },
-      // createdAt: savedBundle.createdAt,
-      // updatedAt: savedBundle.updatedAt,
+      products: ownedProducts.map((p) => ({
+        productId: p._id,
+        productName: p.name,
+        MRP: p.MRP,
+      })),
+      createdBy: {
+        _id: userId,
+        name: sellerName,
+      },
+      createdAt: savedBundle.createdAt,
+      updatedAt: savedBundle.updatedAt,
     };
 
     res.status(201).json({
@@ -195,6 +155,7 @@ export const createBundle = async (req: CustomRequest, res: Response) => {
       bundle: response,
     });
   } catch (error) {
+    console.error('Failed to create bundle', error);
     res.status(500).json({ message: 'Failed to create bundle', error });
   }
 };

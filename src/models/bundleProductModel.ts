@@ -12,7 +12,7 @@ interface IBundleProduct extends Document {
   sellingPrice: number;
   discount: number;
   adminDiscount?: number;
-  products: { productId: mongoose.Types.ObjectId; quantity: number }[];
+  products: { productId: mongoose.Types.ObjectId }[];
   sellerId?: Schema.Types.ObjectId;
   adminId?: Schema.Types.ObjectId;
   createdBy: CreatedBy;
@@ -38,7 +38,6 @@ const bundleProductSchema = new Schema<IBundleProduct>({
         ref: 'Product',
         required: true,
       },
-      quantity: { type: Number, required: true },
     },
   ],
   sellerId: { type: Schema.Types.ObjectId, ref: 'User' },

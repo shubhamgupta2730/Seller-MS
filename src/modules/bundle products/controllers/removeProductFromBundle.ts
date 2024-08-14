@@ -31,7 +31,12 @@ export const removeProductFromBundle = async (req: CustomRequest, res: Response)
 
   try {
     // Find the existing bundle
-    const bundle = await Bundle.findOne({_id: bundleId, isActive: true, isBlocked:false, isDeleted: false});
+    const bundle = await Bundle.findOne({
+      _id: bundleId,
+      isActive: true,
+      isBlocked: false,
+      isDeleted: false,
+    });
     if (!bundle) {
       return res.status(404).json({ message: 'Bundle not found' });
     }
@@ -51,33 +56,22 @@ export const removeProductFromBundle = async (req: CustomRequest, res: Response)
       return res.status(404).json({ message: 'Product not found in bundle' });
     }
 
-
-    const product = await Product.findOne({
-      _id: productId,
-      sellerId: new mongoose.Types.ObjectId(sellerId),
-      isActive: true,
-      isDeleted: false,
-      isBlocked: false,
-    });
-
-    if (!product) {
-      return res.status(403).json({
-        message: 'Unauthorized to remove this product or product is inactive, deleted, or blocked',
-      });
-    }
-
     // Remove the product from the bundle
     bundle.products.splice(productIndex, 1);
 
     // Recalculate total MRP and selling price
     let totalMRP = 0;
     const productPriceMap: { [key: string]: number } = {};
+    const productNameMap: { [key: string]: string } = {};
 
+    // Find all remaining products to calculate MRP and get names
     for (const p of bundle.products) {
       const prod = await Product.findById(p.productId);
-      if (!prod) continue;
-      productPriceMap[p.productId.toString()] = prod.MRP;
-      totalMRP += prod.MRP * p.quantity;
+      if (prod) {
+        productPriceMap[p.productId.toString()] = prod.MRP;
+        productNameMap[p.productId.toString()] = prod.name;
+        totalMRP += prod.MRP;
+      }
     }
 
     // Update the bundle's pricing
@@ -89,12 +83,12 @@ export const removeProductFromBundle = async (req: CustomRequest, res: Response)
     bundle.MRP = totalMRP;
     bundle.sellingPrice = sellingPrice;
 
-
     await bundle.save();
 
-    await Product.updateOne(
+    // Update the product to remove the bundle ID reference
+    await Product.updateMany(
       { _id: productId },
-      { $unset: { bundleId: '' } }
+      { $pull: { bundleIds: new mongoose.Types.ObjectId(bundleId) } } // Use $pull to remove bundleId from array
     );
 
     const response = {
@@ -106,13 +100,13 @@ export const removeProductFromBundle = async (req: CustomRequest, res: Response)
       discount: bundle.discount,
       products: bundle.products.map((p) => ({
         productId: p.productId.toString(),
-        productName: (productPriceMap[p.productId.toString()] ? p.productId.toString() : ''),
-        quantity: p.quantity,
+        productName: productNameMap[p.productId.toString()] || 'Unknown Product',
       })),
     };
 
     res.status(200).json({ message: 'Product removed successfully', bundle: response });
   } catch (error) {
+    console.error('Failed to remove product from bundle', error);
     res.status(500).json({ message: 'Failed to remove product from bundle', error });
   }
 };

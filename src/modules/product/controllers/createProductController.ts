@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import mongoose, { Schema, Types } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 import { Product } from '../../../models/index';
 import Category from '../../../models/categoryModel';
 
@@ -52,6 +52,12 @@ export const createProduct = async (req: CustomRequest, res: Response) => {
   }
 
   try {
+    // Check if a product with the same name already exists
+    const existingProduct = await Product.findOne({ name, sellerId });
+    if (existingProduct) {
+      return res.status(400).json({ message: 'A product with this name already exists' });
+    }
+
     let category = null;
     if (categoryId) {
       category = await Category.findOne({
@@ -60,7 +66,7 @@ export const createProduct = async (req: CustomRequest, res: Response) => {
       });
 
       if (!category) {
-        return res.status(400).json({ message: 'Category does not exist ' });
+        return res.status(400).json({ message: 'Category does not exist' });
       }
     }
 

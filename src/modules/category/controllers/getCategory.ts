@@ -20,7 +20,9 @@ export const getCategoryById = async (req: CustomRequest, res: Response) => {
     }
 
     if (!sellerId) {
-      return res.status(401).json({ message: 'Unauthorized: Seller ID is required' });
+      return res
+        .status(401)
+        .json({ message: 'Unauthorized: Seller ID is required' });
     }
 
     if (!mongoose.Types.ObjectId.isValid(categoryId)) {
@@ -28,9 +30,9 @@ export const getCategoryById = async (req: CustomRequest, res: Response) => {
     }
 
     // Find the category by ID
-    const category: ICategory | null = await Category.findById(categoryId).select(
-      'name description isActive productIds'
-    );
+    const category: ICategory | null = await Category.findById(
+      categoryId
+    ).select('name description isActive productIds');
 
     if (!category) {
       return res.status(404).json({ message: 'Category not found' });
@@ -52,14 +54,16 @@ export const getCategoryById = async (req: CustomRequest, res: Response) => {
     // Find all products associated with the seller in the category
     const products: IProduct[] = await Product.find({
       _id: { $in: category.productIds },
-      sellerId: new mongoose.Types.ObjectId(sellerId), 
+      sellerId: new mongoose.Types.ObjectId(sellerId),
       isActive: true,
       isDeleted: false,
       isBlocked: false,
     }).select('name');
 
     if (products.length === 0) {
-      console.log(`No products found for seller ID ${sellerId} in category ${categoryId}`);
+      console.log(
+        `No products found for seller ID ${sellerId} in category ${categoryId}`
+      );
     }
 
     const response = {

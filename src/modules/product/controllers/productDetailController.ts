@@ -71,15 +71,9 @@ export const getProductDetails = async (req: CustomRequest, res: Response) => {
       {
         $lookup: {
           from: 'bundles',
-          localField: 'bundleId',
+          localField: 'bundleIds', // Change to 'bundleIds'
           foreignField: '_id',
-          as: 'bundle',
-        },
-      },
-      {
-        $unwind: {
-          path: '$bundle',
-          preserveNullAndEmptyArrays: true,
+          as: 'bundles',
         },
       },
       {
@@ -96,8 +90,16 @@ export const getProductDetails = async (req: CustomRequest, res: Response) => {
           },
           categoryId: '$category._id',
           category: '$category.name',
-          bundleId: '$bundle._id',
-          bundleName: '$bundle.name',
+          bundles: {
+            $map: {
+              input: '$bundles',
+              as: 'bundle',
+              in: {
+                _id: '$$bundle._id',
+                name: '$$bundle.name'
+              }
+            }
+          }
         },
       },
     ]);

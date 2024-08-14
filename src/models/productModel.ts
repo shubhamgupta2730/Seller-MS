@@ -10,7 +10,7 @@ export interface IProduct extends Document {
   adminDiscount: number;
   categoryId: Types.ObjectId | null;
   sellerId: Types.ObjectId;
-  bundleId: Types.ObjectId;
+  bundleIds: Types.ObjectId[];
   isActive: boolean;
   isBlocked: boolean;
   isDeleted: boolean;
@@ -23,14 +23,14 @@ export interface IProduct extends Document {
 const productSchema = new Schema<IProduct>({
   name: { type: String, required: true },
   description: { type: String, required: true },
-  MRP: { type: Number, required: true },  
+  MRP: { type: Number, required: true },
   sellingPrice: { type: Number, default: 0 },
-  quantity: { type: Number, required: true }, 
+  quantity: { type: Number, required: true },
   discount: { type: Number, default: 0 },
-  adminDiscount: { type: Number, default: 0 }, //admin discount
+  adminDiscount: { type: Number, default: 0 },
   categoryId: { type: Schema.Types.ObjectId, ref: 'Category', default: null },
   sellerId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-  bundleId: { type: Schema.Types.ObjectId, ref: 'Bundle', default: null },
+  bundleIds: [{ type: Schema.Types.ObjectId, ref: 'Bundle' }],
   isActive: { type: Boolean, default: true },
   isBlocked: { type: Boolean, default: false },
   isDeleted: { type: Boolean, default: false },

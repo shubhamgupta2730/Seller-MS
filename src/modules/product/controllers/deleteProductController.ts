@@ -63,7 +63,7 @@ export const deleteProduct = async (req: CustomRequest, res: Response) => {
       for (const product of bundle.products) {
         const prod = await Product.findById(product.productId);
         if (prod && prod.MRP) {
-          totalMRP += prod.MRP * product.quantity;
+          totalMRP += prod.MRP;
         }
       }
 

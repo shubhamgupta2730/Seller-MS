@@ -25,7 +25,13 @@ export const deleteBundle = async (req: CustomRequest, res: Response) => {
 
   try {
     // Find the bundle
-    const bundle = await Bundle.findOne({_id: bundleId, isActive: true, isBlocked:false, isDeleted: false});
+    const bundle = await Bundle.findOne({
+      _id: bundleId,
+      isActive: true,
+      isBlocked: false,
+      isDeleted: false
+    });
+
     if (!bundle) {
       return res.status(404).json({ message: 'Bundle not found' });
     }
@@ -39,7 +45,7 @@ export const deleteBundle = async (req: CustomRequest, res: Response) => {
 
     // Remove the bundle ID from products associated with the bundle
     await Product.updateMany(
-      { bundleId: new mongoose.Types.ObjectId(bundleId) },
+      { 'bundleIds': new mongoose.Types.ObjectId(bundleId) },
       { $unset: { bundleId: '' } }
     );
 
