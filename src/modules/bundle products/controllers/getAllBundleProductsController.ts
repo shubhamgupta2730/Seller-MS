@@ -20,17 +20,15 @@ export const getAllBundleProductSales = async (
     return res.status(401).json({ message: 'Unauthorized' });
   }
 
-  // Extract and cast query parameters
   const {
     search,
     sortBy,
     sortOrder = 'asc',
     page = '1',
     limit = '5',
-    showBlocked = 'false', // Default to 'false'
+    showBlocked = 'false',
   } = req.query;
 
-  // Type cast and handle defaults
   const searchQuery = typeof search === 'string' ? search : '';
   const sortByField = typeof sortBy === 'string' ? sortBy : 'createdAt';
   const sortOrderValue = typeof sortOrder === 'string' ? sortOrder : 'asc';
@@ -38,7 +36,6 @@ export const getAllBundleProductSales = async (
   const limitNum = parseInt(limit as string, 10);
   const showBlockedProducts = showBlocked === 'true';
 
-  // Create a filter object
   const filter: any = {
     'createdBy.id': new mongoose.Types.ObjectId(userId),
     'createdBy.role': 'seller',
@@ -46,19 +43,16 @@ export const getAllBundleProductSales = async (
     isDeleted: false,
   };
 
-  // Adjust the filter based on showBlocked parameter
   if (showBlockedProducts) {
     filter.isBlocked = true;
   } else {
     filter.isBlocked = false;
   }
 
-  // Add search filter if search query is provided
   if (searchQuery) {
     filter.name = { $regex: searchQuery, $options: 'i' };
   }
 
-  // Determine the sorting criteria
   const sortCriteria: any = {};
   if (sortByField) {
     sortCriteria[sortByField] = sortOrderValue === 'desc' ? -1 : 1;
@@ -75,12 +69,6 @@ export const getAllBundleProductSales = async (
           as: 'productDetails',
         },
       },
-      { $unwind: '$productDetails' },
-      {
-        $match: {
-          'productDetails.isDeleted': false,
-        },
-      },
       {
         $project: {
           _id: 1,
@@ -89,13 +77,28 @@ export const getAllBundleProductSales = async (
           MRP: 1,
           sellingPrice: 1,
           discount: 1,
-          isBlocked: 1, // Include isBlocked in the projection
+          isBlocked: 1,
           products: {
-            productId: 1,
-            quantity: 1,
-            name: '$productDetails.name',
-            MRP: '$productDetails.MRP',
-            sellingPrice: '$productDetails.sellingPrice',
+            $map: {
+              input: '$products',
+              as: 'product',
+              in: {
+                productId: '$$product.productId',
+                quantity: '$$product.quantity',
+                name: {
+                  $arrayElemAt: [
+                    {
+                      $filter: {
+                        input: '$productDetails',
+                        as: 'detail',
+                        cond: { $eq: ['$$detail._id', '$$product.productId'] },
+                      },
+                    },
+                    0,
+                  ],
+                },
+              },
+            },
           },
         },
       },
@@ -106,33 +109,21 @@ export const getAllBundleProductSales = async (
 
     const bundles = await BundleProduct.aggregate(aggregationPipeline);
 
-    // Get total count of bundles for pagination
     const totalBundles = await BundleProduct.countDocuments(filter);
 
-    // Check if bundles are found
     if (!bundles.length) {
       return res
         .status(404)
         .json({ message: 'No bundles found for this seller' });
     }
 
-    // Return the bundles with pagination info
     res.status(200).json({
       bundles: bundles.map((bundle: any) => ({
         _id: bundle._id,
         name: bundle.name,
-        // description: bundle.description,
         MRP: bundle.MRP,
         sellingPrice: bundle.sellingPrice,
         discount: bundle.discount,
-        // isBlocked: bundle.isBlocked,
-        // products: bundle.products.map((product: any) => ({
-        //   productId: product.productId,
-        //   quantity: product.quantity,
-        //   name: product.name,
-        //   MRP: product.MRP,
-        //   sellingPrice: product.sellingPrice,
-        // })),
       })),
       pagination: {
         total: totalBundles,

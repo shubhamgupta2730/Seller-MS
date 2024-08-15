@@ -108,7 +108,7 @@ export const getProductDetails = async (req: CustomRequest, res: Response) => {
       console.log('Product not found or unauthorized');
       return res
         .status(404)
-        .json({ message: 'Product not found or unauthorized' });
+        .json({ message: 'Product not found' });
     }
 
     console.log('Product found and access authorized');

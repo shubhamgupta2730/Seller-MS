@@ -7,7 +7,8 @@ export interface IProduct extends Document {
   sellingPrice: number;
   quantity: number;
   discount: number;
-  adminDiscount: number;
+  adminDiscount: number | null;
+  discountId: Types.ObjectId | null;
   categoryId: Types.ObjectId | null;
   sellerId: Types.ObjectId;
   bundleIds: Types.ObjectId[];
@@ -28,6 +29,7 @@ const productSchema = new Schema<IProduct>({
   quantity: { type: Number, required: true },
   discount: { type: Number, default: 0 },
   adminDiscount: { type: Number, default: 0 },
+  discountId: { type: Schema.Types.ObjectId, ref: 'Discount', default: null },
   categoryId: { type: Schema.Types.ObjectId, ref: 'Category', default: null },
   sellerId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   bundleIds: [{ type: Schema.Types.ObjectId, ref: 'Bundle' }],

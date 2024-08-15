@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document, Types } from 'mongoose';
 
 interface CreatedBy {
   id: mongoose.Types.ObjectId;
@@ -12,6 +12,7 @@ interface IBundleProduct extends Document {
   sellingPrice: number;
   discount: number;
   adminDiscount?: number;
+  discountId: Types.ObjectId | null;
   products: { productId: mongoose.Types.ObjectId }[];
   sellerId?: Schema.Types.ObjectId;
   adminId?: Schema.Types.ObjectId;
@@ -42,6 +43,7 @@ const bundleProductSchema = new Schema<IBundleProduct>({
   ],
   sellerId: { type: Schema.Types.ObjectId, ref: 'User' },
   adminId: { type: Schema.Types.ObjectId, ref: 'Admin' },
+  discountId: { type: Schema.Types.ObjectId, ref: 'Discount', default: null },
   createdBy: {
     id: { type: mongoose.Types.ObjectId, required: true },
     role: { type: String, enum: ['seller', 'admin'], required: true },

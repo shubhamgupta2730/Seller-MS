@@ -74,6 +74,14 @@ export const createSellerProfile = async (
   }
 
   try {
+    // Check if the seller profile already exists
+    const existingSeller = await Seller.findOne({ userId: userId });
+    if (existingSeller) {
+      return res.status(400).json({
+        message: 'Seller profile already exists',
+      });
+    }
+
     const newSeller = new Seller({
       userId: userId,
       shopName,

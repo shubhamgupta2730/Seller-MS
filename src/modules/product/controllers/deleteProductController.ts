@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import { Product, Bundle } from '../../../models/index';
 import Category from '../../../models/categoryModel';
+import Discount from '../../../models/discountModel';
 
 interface CustomRequest extends Request {
   user?: {
@@ -86,6 +87,14 @@ export const deleteProduct = async (req: CustomRequest, res: Response) => {
         { $pull: { productIds: productObjectId } }
       );
     }
+
+
+        // Remove the productID from the Discount model
+        await Discount.updateMany(
+          { productIds: productId },
+          { $pull: { productIds: productId } }
+        );
+    
 
     res.status(200).json({
       message: 'Product removed successfully',

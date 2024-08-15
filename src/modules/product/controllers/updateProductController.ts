@@ -65,7 +65,7 @@ export const updateProduct = async (req: CustomRequest, res: Response) => {
     updateFields.MRP = MRP;
   }
   if (quantity !== undefined) {
-    if (typeof quantity !== 'number' || quantity < 0) {
+    if (typeof quantity !== 'number' || quantity <= 0) {
       return res.status(400).json({
         message: 'Invalid quantity',
       });
