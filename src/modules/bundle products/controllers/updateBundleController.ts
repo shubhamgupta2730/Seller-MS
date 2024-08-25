@@ -15,7 +15,12 @@ interface ProductInfo {
 
 export const updateBundle = async (req: CustomRequest, res: Response) => {
   const { bundleId } = req.query;
-  const { name, description, products, discount }: Partial<{
+  const {
+    name,
+    description,
+    products,
+    discount,
+  }: Partial<{
     name: string;
     description: string;
     products: ProductInfo[];
@@ -147,15 +152,18 @@ export const updateBundle = async (req: CustomRequest, res: Response) => {
       // Optionally, remove old bundle references from products that are no longer in the bundle
       const currentProductIds = products.map((p) => p.productId);
       const removedProductIds = bundle.products
-        .filter(
-          (p) =>
-            !currentProductIds.includes(p.productId.toString())
-        )
+        .filter((p) => !currentProductIds.includes(p.productId.toString()))
         .map((p) => p.productId.toString());
 
       if (removedProductIds.length > 0) {
         await Product.updateMany(
-          { _id: { $in: removedProductIds.map(id => new mongoose.Types.ObjectId(id)) } },
+          {
+            _id: {
+              $in: removedProductIds.map(
+                (id) => new mongoose.Types.ObjectId(id)
+              ),
+            },
+          },
           { $pull: { bundleIds: new mongoose.Types.ObjectId(bundleId) } }
         );
       }
@@ -172,7 +180,7 @@ export const updateBundle = async (req: CustomRequest, res: Response) => {
       sellingPrice: bundle.sellingPrice,
       discount: bundle.discount,
       products: bundle.products.map((p) => ({
-        productId: p.productId.toString()
+        productId: p.productId.toString(),
       })),
     };
 

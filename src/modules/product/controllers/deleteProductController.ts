@@ -14,7 +14,6 @@ export const deleteProduct = async (req: CustomRequest, res: Response) => {
   const { productId } = req.query;
   const sellerId = req.user?.userId;
 
-
   if (
     typeof productId !== 'string' ||
     !mongoose.Types.ObjectId.isValid(productId)
@@ -23,14 +22,12 @@ export const deleteProduct = async (req: CustomRequest, res: Response) => {
     return res.status(400).json({ message: 'Invalid product ID format' });
   }
 
-
   if (!sellerId) {
     console.log('Unauthorized request: Missing seller ID');
     return res.status(401).json({ message: 'Unauthorized' });
   }
 
   try {
-
     const productObjectId = new mongoose.Types.ObjectId(productId);
 
     const product = await Product.findOne({
@@ -74,7 +71,6 @@ export const deleteProduct = async (req: CustomRequest, res: Response) => {
         sellingPrice = totalMRP - totalMRP * (bundle.discount / 100);
       }
 
-
       bundle.MRP = totalMRP;
       bundle.sellingPrice = sellingPrice;
 
@@ -88,13 +84,11 @@ export const deleteProduct = async (req: CustomRequest, res: Response) => {
       );
     }
 
-
-        // Remove the productID from the Discount model
-        await Discount.updateMany(
-          { productIds: productId },
-          { $pull: { productIds: productId } }
-        );
-    
+    // Remove the productID from the Discount model
+    await Discount.updateMany(
+      { productIds: productId },
+      { $pull: { productIds: productId } }
+    );
 
     res.status(200).json({
       message: 'Product removed successfully',

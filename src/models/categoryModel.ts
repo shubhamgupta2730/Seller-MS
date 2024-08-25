@@ -8,7 +8,7 @@ export interface ICategory extends Document {
   createdBy: Schema.Types.ObjectId;
   productIds: Schema.Types.ObjectId[];
   createdAt: Date;
-  updatedAt: Date; 
+  updatedAt: Date;
 }
 // Define the schema with timestamps
 const categorySchema: Schema<ICategory> = new Schema(
@@ -36,9 +36,8 @@ const categorySchema: Schema<ICategory> = new Schema(
       },
     ],
   },
-  { timestamps: true } 
+  { timestamps: true }
 );
-
 
 const Category = model<ICategory>('Category', categorySchema);
 

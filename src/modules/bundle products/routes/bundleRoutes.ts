@@ -6,7 +6,7 @@ import {
   deleteBundle,
   getAllBundleProductSales,
   getBundleDetails,
-  removeProductFromBundle
+  removeProductFromBundle,
 } from '../controllers/index';
 import {
   authenticateSeller,
@@ -30,7 +30,12 @@ router.get(
 );
 
 router.patch('/bundle', authenticateSeller, authorizeSeller, updateBundle);
-router.patch('/remove-product', authenticateSeller, authorizeSeller, removeProductFromBundle);
+router.patch(
+  '/remove-product',
+  authenticateSeller,
+  authorizeSeller,
+  removeProductFromBundle
+);
 router.delete('/bundle', authenticateSeller, authorizeSeller, deleteBundle);
 
 export default router;

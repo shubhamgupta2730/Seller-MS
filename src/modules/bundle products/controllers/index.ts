@@ -11,5 +11,5 @@ export {
   deleteBundle,
   getAllBundleProductSales,
   getBundleDetails,
-  removeProductFromBundle
+  removeProductFromBundle,
 };

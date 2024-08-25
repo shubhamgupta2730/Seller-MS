@@ -86,7 +86,10 @@ export const createBundle = async (req: CustomRequest, res: Response) => {
     }
 
     // Calculate total MRP
-    let totalMRP = ownedProducts.reduce((sum, product) => sum + product.MRP, 0);
+    const totalMRP = ownedProducts.reduce(
+      (sum, product) => sum + product.MRP,
+      0
+    );
 
     // Calculate selling price based on discount percentage
     let sellingPrice = totalMRP;
@@ -122,7 +125,7 @@ export const createBundle = async (req: CustomRequest, res: Response) => {
     // Update products to reference the new bundle
     await Product.updateMany(
       { _id: { $in: products } },
-      { $push: { bundleIds: savedBundle._id } } 
+      { $push: { bundleIds: savedBundle._id } }
     );
 
     // Fetch the seller's name

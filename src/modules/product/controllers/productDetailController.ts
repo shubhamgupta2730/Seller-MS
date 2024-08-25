@@ -51,7 +51,7 @@ export const getProductDetails = async (req: CustomRequest, res: Response) => {
       {
         $unwind: {
           path: '$category',
-          preserveNullAndEmptyArrays: true, 
+          preserveNullAndEmptyArrays: true,
         },
       },
       {
@@ -86,7 +86,7 @@ export const getProductDetails = async (req: CustomRequest, res: Response) => {
           quantity: 1,
           discount: 1,
           sellerName: {
-            $concat: ['$seller.firstName', ' ', '$seller.lastName']
+            $concat: ['$seller.firstName', ' ', '$seller.lastName'],
           },
           categoryId: '$category._id',
           category: '$category.name',
@@ -96,19 +96,17 @@ export const getProductDetails = async (req: CustomRequest, res: Response) => {
               as: 'bundle',
               in: {
                 _id: '$$bundle._id',
-                name: '$$bundle.name'
-              }
-            }
-          }
+                name: '$$bundle.name',
+              },
+            },
+          },
         },
       },
     ]);
 
     if (!productDetails.length) {
       console.log('Product not found or unauthorized');
-      return res
-        .status(404)
-        .json({ message: 'Product not found' });
+      return res.status(404).json({ message: 'Product not found' });
     }
 
     console.log('Product found and access authorized');

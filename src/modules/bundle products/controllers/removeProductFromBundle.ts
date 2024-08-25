@@ -8,7 +8,10 @@ interface CustomRequest extends Request {
   };
 }
 
-export const removeProductFromBundle = async (req: CustomRequest, res: Response) => {
+export const removeProductFromBundle = async (
+  req: CustomRequest,
+  res: Response
+) => {
   const { bundleId } = req.query;
   const { productId }: { productId: string } = req.body;
   const sellerId = req.user?.userId;
@@ -68,7 +71,7 @@ export const removeProductFromBundle = async (req: CustomRequest, res: Response)
     for (const p of bundle.products) {
       const prod = await Product.findById(p.productId);
       if (prod) {
-        productPriceMap[p.productId.toString()] = prod.MRP;
+        productPriceMap[p.productId.toString()] = prod.sellingPrice;
         productNameMap[p.productId.toString()] = prod.name;
         totalMRP += prod.MRP;
       }
@@ -100,13 +103,18 @@ export const removeProductFromBundle = async (req: CustomRequest, res: Response)
       discount: bundle.discount,
       products: bundle.products.map((p) => ({
         productId: p.productId.toString(),
-        productName: productNameMap[p.productId.toString()] || 'Unknown Product',
+        productName:
+          productNameMap[p.productId.toString()] || 'Unknown Product',
       })),
     };
 
-    res.status(200).json({ message: 'Product removed successfully', bundle: response });
+    res
+      .status(200)
+      .json({ message: 'Product removed successfully', bundle: response });
   } catch (error) {
     console.error('Failed to remove product from bundle', error);
-    res.status(500).json({ message: 'Failed to remove product from bundle', error });
+    res
+      .status(500)
+      .json({ message: 'Failed to remove product from bundle', error });
   }
 };

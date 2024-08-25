@@ -29,7 +29,7 @@ export const deleteBundle = async (req: CustomRequest, res: Response) => {
       _id: bundleId,
       isActive: true,
       isBlocked: false,
-      isDeleted: false
+      isDeleted: false,
     });
 
     if (!bundle) {
@@ -45,7 +45,7 @@ export const deleteBundle = async (req: CustomRequest, res: Response) => {
 
     // Remove the bundle ID from products associated with the bundle
     await Product.updateMany(
-      { 'bundleIds': new mongoose.Types.ObjectId(bundleId) },
+      { bundleIds: new mongoose.Types.ObjectId(bundleId) },
       { $unset: { bundleId: '' } }
     );
 

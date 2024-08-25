@@ -55,7 +55,9 @@ export const createProduct = async (req: CustomRequest, res: Response) => {
     // Check if a product with the same name already exists
     const existingProduct = await Product.findOne({ name, sellerId });
     if (existingProduct) {
-      return res.status(400).json({ message: 'A product with this name already exists' });
+      return res
+        .status(400)
+        .json({ message: 'A product with this name already exists' });
     }
 
     let category = null;
