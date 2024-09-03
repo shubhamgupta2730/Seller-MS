@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import { Product } from '../../../models/index';
-
+import User from '../../../models/userModel';
+import Review from '../../../models/reviewModel';
 interface CustomRequest extends Request {
   user?: {
     userId: string;
@@ -71,9 +72,53 @@ export const getProductDetails = async (req: CustomRequest, res: Response) => {
       {
         $lookup: {
           from: 'bundles',
-          localField: 'bundleIds', // Change to 'bundleIds'
+          localField: 'bundleIds', // Changed to 'bundleIds'
           foreignField: '_id',
           as: 'bundles',
+        },
+      },
+      {
+        $lookup: {
+          from: 'reviews',
+          let: { product_id: '$_id' },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ['$productId', '$$product_id'] },
+                    { $ne: ['$isDeleted', true] },
+                  ],
+                },
+              },
+            },
+            {
+              $lookup: {
+                from: 'users',
+                localField: 'userId',
+                foreignField: '_id',
+                as: 'reviewer',
+              },
+            },
+            {
+              $unwind: {
+                path: '$reviewer',
+                preserveNullAndEmptyArrays: true,
+              },
+            },
+            {
+              $project: {
+                _id: 1,
+                review: 1,
+                rating: 1,
+                images: 1,
+                reviewerName: {
+                  $concat: ['$reviewer.firstName', ' ', '$reviewer.lastName'],
+                },
+              },
+            },
+          ],
+          as: 'reviews',
         },
       },
       {
@@ -100,6 +145,7 @@ export const getProductDetails = async (req: CustomRequest, res: Response) => {
               },
             },
           },
+          reviews: 1, // Include reviews in the response
         },
       },
     ]);
