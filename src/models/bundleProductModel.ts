@@ -5,7 +5,7 @@ interface CreatedBy {
   role: 'seller' | 'admin';
 }
 
-interface IBundleProduct extends Document {
+export interface IBundleProduct extends Document {
   name: string;
   description: string;
   MRP: number;
