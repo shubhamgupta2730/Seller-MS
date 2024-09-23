@@ -128,7 +128,7 @@ const UserSchema: Schema<IUser> = new Schema(
       required: true,
       default: 'user',
     },
-    address: [AddressSchema], 
+    address: [AddressSchema],
   },
   {
     timestamps: true,

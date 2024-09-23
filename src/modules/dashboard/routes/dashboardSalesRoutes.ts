@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getSellerSalesDashboard } from '../controllers/dashboardSales';
+import { getSellerSalesAnalytics } from '../controllers/dashboardSales';
 import {
   authenticateSeller,
   authorizeSeller,
@@ -12,7 +12,7 @@ router.get(
   '/get-total-sales',
   authenticateSeller,
   authorizeSeller,
-  getSellerSalesDashboard
+  getSellerSalesAnalytics
 );
 
 export default router;
