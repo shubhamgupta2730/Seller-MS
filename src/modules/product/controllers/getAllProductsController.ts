@@ -82,6 +82,7 @@ export const getAllSellerProducts = async (
         $project: {
           _id: 1,
           name: 1,
+          images:1,
           // description: 1,
           MRP: 1,
           sellingPrice: 1,

@@ -12,6 +12,7 @@ export interface IProduct extends Document {
   categoryId: Types.ObjectId | null;
   sellerId: Types.ObjectId;
   bundleIds: Types.ObjectId[];
+  images: string[];
   isActive: boolean;
   isBlocked: boolean;
   isDeleted: boolean;
@@ -33,6 +34,7 @@ const productSchema = new Schema<IProduct>({
   categoryId: { type: Schema.Types.ObjectId, ref: 'Category', default: null },
   sellerId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   bundleIds: [{ type: Schema.Types.ObjectId, ref: 'Bundle' }],
+  images: [{ type: String, required: true }],
   isActive: { type: Boolean, default: true },
   isBlocked: { type: Boolean, default: false },
   isDeleted: { type: Boolean, default: false },
