@@ -24,25 +24,24 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
-const productSchema = new mongoose_1.Schema({
-    name: { type: String, required: true },
-    description: { type: String, required: true },
-    MRP: { type: Number, required: true },
-    sellingPrice: { type: Number, default: 0 },
-    quantity: { type: Number, required: true },
-    discount: { type: Number, default: 0 },
-    adminDiscount: { type: Number, default: 0 },
-    discountId: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Discount', default: null },
-    categoryId: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Category', default: null },
-    sellerId: { type: mongoose_1.Schema.Types.ObjectId, ref: 'User', required: true },
-    bundleIds: [{ type: mongoose_1.Schema.Types.ObjectId, ref: 'Bundle' }],
-    images: [{ type: String, required: true }],
-    isActive: { type: Boolean, default: true },
-    isBlocked: { type: Boolean, default: false },
+const ReviewSchema = new mongoose_1.Schema({
+    userId: {
+        type: mongoose_1.default.Schema.Types.ObjectId,
+        required: true,
+        ref: 'User',
+    },
+    orderId: {
+        type: mongoose_1.default.Schema.Types.ObjectId,
+        required: true,
+        ref: 'Order',
+    },
+    productId: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'Product' },
+    bundleId: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'Bundle' },
+    rating: { type: Number, required: true },
+    reviewText: { type: String, required: false },
+    images: [{ type: String }],
     isDeleted: { type: Boolean, default: false },
-    blockedBy: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Admin', default: null },
-    createdBy: { type: mongoose_1.Schema.Types.ObjectId, ref: 'User', required: true },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
-});
-exports.default = mongoose_1.default.model('Product', productSchema);
+}, { timestamps: true });
+exports.default = mongoose_1.default.model('Review', ReviewSchema);

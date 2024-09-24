@@ -1,38 +1,31 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const mongoose_1 = __importStar(require("mongoose"));
+const mongoose_1 = require("mongoose");
 const discountSchema = new mongoose_1.Schema({
-    productId: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Product' },
-    bundleId: { type: mongoose_1.Schema.Types.ObjectId, ref: 'BundleProduct' },
-    sellerAuthId: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Auth', required: true },
-    discountType: { type: String, required: true },
-    discountValue: { type: Number, required: true },
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now },
+    discount: { type: Number, required: true, min: 0, max: 100 },
+    code: { type: String, required: true },
+    isActive: { type: Boolean, default: true },
+    isDeleted: { type: Boolean, default: false },
+    createdBy: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Admin', required: true },
+    type: {
+        type: String,
+        enum: ['sellingPrice', 'MRP'],
+    },
+    productIds: [{ type: mongoose_1.Schema.Types.ObjectId, ref: 'Product' }],
+    bundleIds: [{ type: mongoose_1.Schema.Types.ObjectId, ref: 'Bundle' }],
+}, {
+    timestamps: true,
 });
-exports.default = mongoose_1.default.model('Discount', discountSchema);
+// Middleware to set isActive based on current date
+discountSchema.pre('save', function (next) {
+    const now = new Date();
+    this.isActive =
+        this.startDate <= now &&
+            this.endDate > now &&
+            this.startDate < this.endDate;
+    next();
+});
+const Discount = (0, mongoose_1.model)('Discount', discountSchema);
+exports.default = Discount;

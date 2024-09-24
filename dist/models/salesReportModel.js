@@ -26,7 +26,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
 const salesReportSchema = new mongoose_1.Schema({
     productId: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Product', required: true },
-    sellerAuthId: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Auth', required: true },
+    sellerId: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Auth', required: true },
     quantitySold: { type: Number, required: true },
     totalRevenue: { type: Number, required: true },
     reportDate: { type: Date, required: true },

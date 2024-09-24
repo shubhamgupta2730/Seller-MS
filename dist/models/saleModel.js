@@ -24,25 +24,41 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
-const productSchema = new mongoose_1.Schema({
+const saleCategorySchema = new mongoose_1.Schema({
+    categoryId: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: 'Category',
+        required: true,
+    },
+    discount: { type: Number, required: true },
+});
+const saleProductSchema = new mongoose_1.Schema({
+    productId: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: 'Product',
+        required: true,
+    },
+});
+const saleBundleSchema = new mongoose_1.Schema({
+    bundleId: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: 'Bundle',
+        required: true,
+    },
+});
+const saleSchema = new mongoose_1.Schema({
     name: { type: String, required: true },
     description: { type: String, required: true },
-    MRP: { type: Number, required: true },
-    sellingPrice: { type: Number, default: 0 },
-    quantity: { type: Number, required: true },
-    discount: { type: Number, default: 0 },
-    adminDiscount: { type: Number, default: 0 },
-    discountId: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Discount', default: null },
-    categoryId: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Category', default: null },
-    sellerId: { type: mongoose_1.Schema.Types.ObjectId, ref: 'User', required: true },
-    bundleIds: [{ type: mongoose_1.Schema.Types.ObjectId, ref: 'Bundle' }],
-    images: [{ type: String, required: true }],
+    startDate: { type: Date, required: true },
+    endDate: { type: Date, required: true },
+    categories: [saleCategorySchema],
+    products: [saleProductSchema],
+    bundles: [saleBundleSchema],
     isActive: { type: Boolean, default: true },
-    isBlocked: { type: Boolean, default: false },
     isDeleted: { type: Boolean, default: false },
-    blockedBy: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Admin', default: null },
-    createdBy: { type: mongoose_1.Schema.Types.ObjectId, ref: 'User', required: true },
+    discountApplied: { type: Boolean, default: false },
+    createdBy: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Admin', required: true },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
 });
-exports.default = mongoose_1.default.model('Product', productSchema);
+exports.default = mongoose_1.default.model('Sale', saleSchema);

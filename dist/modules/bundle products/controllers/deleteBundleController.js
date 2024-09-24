@@ -8,40 +8,48 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteBundle = void 0;
+const mongoose_1 = __importDefault(require("mongoose"));
 const index_1 = require("../../../models/index");
 const deleteBundle = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
+    var _a, _b;
     const { bundleId } = req.query;
-    const sellerAuthId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.userId;
-    if (!sellerAuthId) {
+    const sellerId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.userId;
+    if (!sellerId) {
         return res.status(401).json({ message: 'Unauthorized' });
     }
-    if (!bundleId || typeof bundleId !== 'string') {
-        return res.status(400).json({ message: 'Invalid bundle ID' });
+    if (typeof bundleId !== 'string' ||
+        !mongoose_1.default.Types.ObjectId.isValid(bundleId)) {
+        return res.status(400).json({ message: 'Invalid bundle ID format' });
     }
     try {
-        const bundle = yield index_1.BundleProduct.findById(bundleId);
+        // Find the bundle
+        const bundle = yield index_1.Bundle.findOne({
+            _id: bundleId,
+            isActive: true,
+            isBlocked: false,
+            isDeleted: false,
+        });
         if (!bundle) {
             return res.status(404).json({ message: 'Bundle not found' });
         }
-        if (bundle.sellerAuthId.toString() !== sellerAuthId) {
+        // Check if the current user is authorized to delete the bundle
+        if (((_b = bundle.sellerId) === null || _b === void 0 ? void 0 : _b.toString()) !== sellerId) {
             return res
                 .status(403)
                 .json({ message: 'Unauthorized to delete this bundle' });
         }
         // Remove the bundle ID from products associated with the bundle
-        yield index_1.Product.updateMany({ bundleId: bundle._id }, { $unset: { bundleId: '' } });
-        // Find and delete associated discounts
-        const result = yield index_1.Discount.deleteMany({ bundleId: bundle._id });
-        if (result.deletedCount === 0) {
-            console.warn('No associated discounts found for this bundle');
-        }
-        // Delete the bundle
-        yield index_1.BundleProduct.deleteOne({ _id: bundleId });
+        yield index_1.Product.updateMany({ bundleIds: new mongoose_1.default.Types.ObjectId(bundleId) }, { $unset: { bundleId: '' } });
+        // Soft delete the bundle
+        bundle.isDeleted = true;
+        yield bundle.save();
         res.status(200).json({
-            message: 'Bundle and associated discounts deleted successfully',
+            message: 'Bundle deleted successfully.',
         });
     }
     catch (error) {

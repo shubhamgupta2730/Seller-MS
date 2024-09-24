@@ -27,17 +27,31 @@ const mongoose_1 = __importStar(require("mongoose"));
 const bundleProductSchema = new mongoose_1.Schema({
     name: { type: String, required: true },
     description: { type: String, required: true },
-    price: { type: Number, required: true },
-    finalPrice: { type: Number, default: 0 },
+    MRP: { type: Number, required: true },
+    sellingPrice: { type: Number, required: true },
+    discount: { type: Number, required: true },
+    adminDiscount: { type: Number, default: 0 },
     products: [
         {
-            productId: { type: mongoose_1.default.Types.ObjectId, ref: 'Product' },
-            quantity: { type: Number, required: true },
+            productId: {
+                type: mongoose_1.default.Types.ObjectId,
+                ref: 'Product',
+                required: true,
+            },
         },
     ],
-    discounts: [{ type: mongoose_1.Schema.Types.ObjectId, ref: 'Discount' }],
-    sellerAuthId: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Auth', required: true },
+    sellerId: { type: mongoose_1.Schema.Types.ObjectId, ref: 'User' },
+    adminId: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Admin' },
+    discountId: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Discount', default: null },
+    createdBy: {
+        id: { type: mongoose_1.default.Types.ObjectId, required: true },
+        role: { type: String, enum: ['seller', 'admin'], required: true },
+    },
+    isActive: { type: Boolean, default: true },
+    isDeleted: { type: Boolean, default: false },
+    isBlocked: { type: Boolean, default: false },
+    blockedBy: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Admin' },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
 });
-exports.default = mongoose_1.default.model('BundleProduct', bundleProductSchema);
+exports.default = mongoose_1.default.model('Bundle', bundleProductSchema);

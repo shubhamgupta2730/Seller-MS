@@ -16,49 +16,59 @@ exports.createSellerProfile = void 0;
 const sellerModel_1 = __importDefault(require("../../../models/sellerModel"));
 const createSellerProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    const { firstName, lastName, dob, gender, shopName, shopDescription, address, shopContactNumber, businessLicense, taxId, website, } = req.body;
+    const { shopName, shopDescription, shopContactNumber, businessLicense, taxId, website, } = req.body;
     const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.userId;
     if (!userId) {
         return res.status(400).json({ message: 'User ID not found' });
     }
-    if (!firstName || !lastName || !shopName || !shopDescription || !address) {
+    if (!shopName || !shopDescription) {
         return res.status(400).json({ message: 'Missing required fields' });
     }
-    if (typeof firstName !== 'string' ||
-        typeof lastName !== 'string' ||
-        typeof shopName !== 'string' ||
-        typeof shopDescription !== 'string' ||
-        typeof address !== 'string') {
+    if (typeof shopName !== 'string' || typeof shopDescription !== 'string') {
         return res.status(400).json({ message: 'Invalid data types' });
-    }
-    if (firstName.length < 2 || lastName.length < 2) {
-        return res
-            .status(400)
-            .json({ message: 'Names must be at least 2 characters long' });
     }
     if (shopName.length < 3) {
         return res
             .status(400)
             .json({ message: 'Shop name must be at least 3 characters long' });
     }
-    // Validate date of birth
-    if (dob && !isValidDate(dob)) {
-        return res.status(400).json({ message: 'Invalid date of birth format' });
+    if (shopDescription.length < 10) {
+        return res.status(400).json({
+            message: 'Shop description must be at least 10 characters long',
+        });
     }
-    // Validate contact number format
-    if (shopContactNumber && !/^\+?[1-9]\d{1,14}$/.test(shopContactNumber)) {
+    if (shopContactNumber && typeof shopContactNumber !== 'number') {
         return res.status(400).json({ message: 'Invalid contact number format' });
     }
+    if (shopContactNumber && !/^\d{10,15}$/.test(shopContactNumber)) {
+        return res
+            .status(400)
+            .json({ message: 'Contact number must be between 10 and 15 digits' });
+    }
+    if (businessLicense && typeof businessLicense !== 'string') {
+        return res.status(400).json({ message: 'Invalid business license format' });
+    }
+    if (taxId && typeof taxId !== 'string') {
+        return res.status(400).json({ message: 'Invalid tax ID format' });
+    }
+    if (website && typeof website !== 'string') {
+        return res.status(400).json({ message: 'Invalid website format' });
+    }
+    if (website && !/^https?:\/\/[\w\-]+\.[\w\-]+/.test(website)) {
+        return res.status(400).json({ message: 'Invalid website URL' });
+    }
     try {
+        // Check if the seller profile already exists
+        const existingSeller = yield sellerModel_1.default.findOne({ userId: userId });
+        if (existingSeller) {
+            return res.status(400).json({
+                message: 'Seller profile already exists',
+            });
+        }
         const newSeller = new sellerModel_1.default({
             userId: userId,
-            firstName,
-            lastName,
-            dob,
-            gender,
             shopName,
             shopDescription,
-            address,
             shopContactNumber,
             businessLicense,
             taxId,
@@ -74,11 +84,3 @@ const createSellerProfile = (req, res) => __awaiter(void 0, void 0, void 0, func
     }
 });
 exports.createSellerProfile = createSellerProfile;
-//  function to validate date format
-const isValidDate = (dateString) => {
-    const regex = /^\d{4}-\d{2}-\d{2}$/;
-    if (!dateString.match(regex))
-        return false;
-    const date = new Date(dateString);
-    return date instanceof Date && !isNaN(date.getTime());
-};

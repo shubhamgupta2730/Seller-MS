@@ -13,53 +13,113 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getAllSellerProducts = void 0;
+const mongoose_1 = __importDefault(require("mongoose"));
 const productModel_1 = __importDefault(require("../../../models/productModel"));
 const getAllSellerProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
+    var _a, _b;
     const sellerId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.userId;
     if (!sellerId) {
         console.log('Seller ID is missing from the request');
         return res.status(400).json({ message: 'Seller ID is missing' });
     }
-    const { search = '', sortBy = 'name', sortOrder = 'asc', page = 1, limit = 5, } = req.query;
-    // Create filter for search
-    const filter = {
-        sellerAuthId: sellerId,
-        name: { $regex: search, $options: 'i' }, // Case-insensitive search
-    };
-    // Create sort criteria
-    const sortCriteria = {
-        [sortBy]: sortOrder === 'desc' ? -1 : 1,
-    };
-    // Convert page and limit to numbers
+    const { search = '', sortBy = 'name', sortOrder = 'asc', page = 1, limit = 5, category = '', showBlocked = 'false', } = req.query;
     const pageNum = parseInt(page, 10);
     const limitNum = parseInt(limit, 10);
+    const showBlockedProducts = showBlocked === 'true';
     try {
-        // Fetch products for the seller with filters, sorting, and pagination
-        const products = yield productModel_1.default.find(filter)
-            .populate({
-            path: 'discounts',
-            select: 'discountType discountValue startDate endDate',
-        })
-            .populate({
-            path: 'bundleId',
-            select: 'bundleName bundleDescription',
-        })
-            .sort(sortCriteria)
-            .skip((pageNum - 1) * limitNum)
-            .limit(limitNum);
+        const matchStage = {
+            sellerId: new mongoose_1.default.Types.ObjectId(sellerId),
+            isActive: true,
+            isDeleted: false,
+            isBlocked: showBlockedProducts,
+            name: { $regex: search, $options: 'i' },
+        };
+        if (category) {
+            matchStage['category.name'] = { $regex: `^${category}$`, $options: 'i' }; // Exact match for category name
+        }
+        console.log('Match Stage:', matchStage);
+        const products = yield productModel_1.default.aggregate([
+            {
+                $lookup: {
+                    from: 'categories',
+                    localField: 'categoryId',
+                    foreignField: '_id',
+                    as: 'category',
+                },
+            },
+            {
+                $unwind: {
+                    path: '$category',
+                    preserveNullAndEmptyArrays: true,
+                },
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'sellerId',
+                    foreignField: '_id',
+                    as: 'seller',
+                },
+            },
+            {
+                $unwind: {
+                    path: '$seller',
+                    preserveNullAndEmptyArrays: true,
+                },
+            },
+            { $match: matchStage },
+            {
+                $project: {
+                    _id: 1,
+                    name: 1,
+                    images: 1,
+                    // description: 1,
+                    MRP: 1,
+                    sellingPrice: 1,
+                    // quantity: 1,
+                    discount: 1,
+                    categoryId: '$category._id',
+                    category: '$category.name',
+                    // sellerName: {
+                    //   $concat: ['$seller.firstName', ' ', '$seller.lastName']
+                    // }
+                },
+            },
+            { $sort: { [sortBy]: sortOrder === 'desc' ? -1 : 1 } },
+            { $skip: (pageNum - 1) * limitNum },
+            { $limit: limitNum },
+        ]);
         if (!products.length) {
             console.log('No products found for this seller');
             return res
                 .status(404)
                 .json({ message: 'No products found for this seller' });
         }
-        // Get total count of products for pagination
-        const totalProducts = yield productModel_1.default.countDocuments(filter);
+        const totalProducts = yield productModel_1.default.aggregate([
+            {
+                $lookup: {
+                    from: 'categories',
+                    localField: 'categoryId',
+                    foreignField: '_id',
+                    as: 'category',
+                },
+            },
+            {
+                $unwind: {
+                    path: '$category',
+                    preserveNullAndEmptyArrays: true,
+                },
+            },
+            { $match: matchStage },
+            {
+                $count: 'total',
+            },
+        ]);
+        const total = ((_b = totalProducts[0]) === null || _b === void 0 ? void 0 : _b.total) || 0;
         res.status(200).json({
             products,
             pagination: {
-                total: totalProducts,
+                total: total,
                 page: pageNum,
                 limit: limitNum,
             },

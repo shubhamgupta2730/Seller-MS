@@ -8,43 +8,155 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getProductDetails = void 0;
+const mongoose_1 = __importDefault(require("mongoose"));
 const index_1 = require("../../../models/index");
 const getProductDetails = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const { productId } = req.query;
-    const sellerAuthId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.userId;
+    const sellerId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.userId;
     if (!productId) {
         console.log('Product ID is missing from the request');
         return res.status(400).json({ message: 'Product ID is required' });
     }
-    if (!sellerAuthId) {
+    if (!sellerId) {
         console.log('Seller ID is missing from the request');
-        return res.status(400).json({ message: 'Seller ID is missing' });
+        return res.status(400).json({ message: 'Seller ID is required' });
+    }
+    if (typeof productId !== 'string' ||
+        !mongoose_1.default.Types.ObjectId.isValid(productId)) {
+        return res.status(400).json({ message: 'Invalid product ID format' });
     }
     try {
-        const product = yield index_1.Product.findById(productId)
-            .populate({
-            path: 'discounts',
-            select: 'discountType discountValue startDate endDate',
-        })
-            .populate({
-            path: 'bundleId',
-            select: 'bundleName bundleDescription',
-        });
-        if (!product) {
-            console.log('Product not found');
+        const productDetails = yield index_1.Product.aggregate([
+            {
+                $match: {
+                    _id: new mongoose_1.default.Types.ObjectId(productId),
+                    sellerId: new mongoose_1.default.Types.ObjectId(sellerId),
+                    isActive: true,
+                    isBlocked: false,
+                    isDeleted: false,
+                },
+            },
+            {
+                $lookup: {
+                    from: 'categories',
+                    localField: 'categoryId',
+                    foreignField: '_id',
+                    as: 'category',
+                },
+            },
+            {
+                $unwind: {
+                    path: '$category',
+                    preserveNullAndEmptyArrays: true,
+                },
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'sellerId',
+                    foreignField: '_id',
+                    as: 'seller',
+                },
+            },
+            {
+                $unwind: {
+                    path: '$seller',
+                    preserveNullAndEmptyArrays: true,
+                },
+            },
+            {
+                $lookup: {
+                    from: 'bundles',
+                    localField: 'bundleIds', // Changed to 'bundleIds'
+                    foreignField: '_id',
+                    as: 'bundles',
+                },
+            },
+            {
+                $lookup: {
+                    from: 'reviews',
+                    let: { product_id: '$_id' },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: ['$productId', '$$product_id'] },
+                                        { $ne: ['$isDeleted', true] },
+                                    ],
+                                },
+                            },
+                        },
+                        {
+                            $lookup: {
+                                from: 'users',
+                                localField: 'userId',
+                                foreignField: '_id',
+                                as: 'reviewer',
+                            },
+                        },
+                        {
+                            $unwind: {
+                                path: '$reviewer',
+                                preserveNullAndEmptyArrays: true,
+                            },
+                        },
+                        {
+                            $project: {
+                                _id: 1,
+                                review: 1,
+                                rating: 1,
+                                images: 1,
+                                reviewerName: {
+                                    $concat: ['$reviewer.firstName', ' ', '$reviewer.lastName'],
+                                },
+                            },
+                        },
+                    ],
+                    as: 'reviews',
+                },
+            },
+            {
+                $project: {
+                    _id: 1,
+                    name: 1,
+                    images: 1,
+                    description: 1,
+                    MRP: 1,
+                    sellingPrice: 1,
+                    quantity: 1,
+                    discount: 1,
+                    sellerName: {
+                        $concat: ['$seller.firstName', ' ', '$seller.lastName'],
+                    },
+                    categoryId: '$category._id',
+                    category: '$category.name',
+                    bundles: {
+                        $map: {
+                            input: '$bundles',
+                            as: 'bundle',
+                            in: {
+                                _id: '$$bundle._id',
+                                name: '$$bundle.name',
+                            },
+                        },
+                    },
+                    reviews: 1, // Include reviews in the response
+                },
+            },
+        ]);
+        if (!productDetails.length) {
+            console.log('Product not found or unauthorized');
             return res.status(404).json({ message: 'Product not found' });
         }
-        if (product.sellerAuthId.toString() !== sellerAuthId) {
-            console.log('Unauthorized access attempt');
-            return res
-                .status(403)
-                .json({ message: 'You are not authorized to view this product' });
-        }
         console.log('Product found and access authorized');
-        res.status(200).json({ product });
+        res.status(200).json({ product: productDetails[0] });
     }
     catch (error) {
         console.log('Error occurred:', error);
